@@ -1,14 +1,12 @@
 package com.bytemarket.bytemarket_api.dto;
 
-import domain.ProductType;
+import com.bytemarket.bytemarket_api.domain.ProductType;
 import java.math.BigDecimal;
+import java.util.List;
 
 public record OrderItemReceiptResponseDTO(
-        Long productId,
-        String productName,
-        ProductType type,
+        String title,
         Integer quantity,
         BigDecimal price,
-        String credentialContent
-) {
-}
+        List<String> deliveredContent //(Login/Senha ou Chave)
+) {}

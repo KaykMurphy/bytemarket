@@ -1,7 +1,5 @@
 package com.bytemarket.bytemarket_api.dto;
 
-import domain.Product;
-
 import java.util.List;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package domain;
+package com.bytemarket.bytemarket_api.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
