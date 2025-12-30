@@ -11,7 +11,7 @@ public class MockPaymentService implements PaymentStrategy{
     public boolean processPayment(BigDecimal amount) {
 
         // Simulação de pagamento: sempre autorizado.
-        // Em produção, substitua por integração com gateway real (Stripe, PagSeguro).
+        // Em produção, gateway real (Stripe, PagSeguro).
         return true;
     }
 }
