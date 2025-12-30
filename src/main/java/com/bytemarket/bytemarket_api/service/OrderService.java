@@ -13,7 +13,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable; // <--- O IMPORT CORRETO É ESSE
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

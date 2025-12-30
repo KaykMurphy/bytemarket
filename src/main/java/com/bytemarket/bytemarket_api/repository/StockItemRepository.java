@@ -1,5 +1,6 @@
 package com.bytemarket.bytemarket_api.repository;
 
+import com.bytemarket.bytemarket_api.domain.Order;
 import com.bytemarket.bytemarket_api.domain.Product;
 import com.bytemarket.bytemarket_api.domain.StockItem;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,5 @@ public interface StockItemRepository extends JpaRepository<StockItem, Long> {
     List<StockItem> findByProductAndSoldFalse(Product product, Pageable pageable);
 
     long countByProductAndSoldFalse(Product product);
+
 }

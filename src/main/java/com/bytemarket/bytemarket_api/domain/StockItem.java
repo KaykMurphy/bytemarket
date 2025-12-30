@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "stocksItems_tb")
+@Table(name = "stockItems_tb")
 public class StockItem { //O item digital real (segredo/login)
 
     @Id
@@ -30,7 +30,6 @@ public class StockItem { //O item digital real (segredo/login)
 
     @Version
     private Long version;
-
 }
 
 
