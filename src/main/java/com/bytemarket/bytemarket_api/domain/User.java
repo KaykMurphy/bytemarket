@@ -33,6 +33,10 @@ public class User { // Representar o comprador
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @OneToMany(mappedBy = "user")
     private List<Order> orders = new ArrayList<>();
 }

@@ -33,3 +33,5 @@ build/
 .vscode/
 
 roadmap.md
+
+application.properties

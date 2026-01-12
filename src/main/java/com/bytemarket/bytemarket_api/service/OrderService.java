@@ -5,6 +5,7 @@ import com.bytemarket.bytemarket_api.dto.OrderItemDTO;
 import com.bytemarket.bytemarket_api.dto.OrderItemReceiptResponseDTO;
 import com.bytemarket.bytemarket_api.dto.OrderReceiptDTO;
 import com.bytemarket.bytemarket_api.dto.OrderRequestDTO;
+import com.bytemarket.bytemarket_api.exceptions.OutOfStockException;
 import com.bytemarket.bytemarket_api.repository.OrderRepository;
 import com.bytemarket.bytemarket_api.repository.ProductRepository;
 import com.bytemarket.bytemarket_api.repository.StockItemRepository;
@@ -56,7 +57,7 @@ public class OrderService {
 
                 long availableCount = stockItemRepository.countByProductAndSoldFalse(product);
                 if (availableCount < quantity) {
-                    throw new IllegalArgumentException("Estoque insuficiente para: " + product.getTitle());
+                    throw new OutOfStockException("Estoque insuficiente para: " + product.getTitle());
                 }
 
                 List<StockItem> stockItems = stockItemRepository.findByProductAndSoldFalse(
@@ -78,7 +79,7 @@ public class OrderService {
         }
 
         if (!paymentStrategy.processPayment(total)) {
-            throw new IllegalArgumentException("Pagamento falhou.");
+            throw new RuntimeException("Pagamento não autorizado");
         }
 
         Order order = new Order(null, Instant.now(), total, Status.PAID, user, orderItems);
