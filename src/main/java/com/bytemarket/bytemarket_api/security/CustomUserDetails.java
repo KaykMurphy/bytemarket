@@ -2,7 +2,6 @@ package com.bytemarket.bytemarket_api.security;
 
 import com.bytemarket.bytemarket_api.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,13 +16,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRole().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getValue()))
-                .toList();
+        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return user.getEmail();
     }
 
