@@ -1,10 +1,9 @@
 spring.application.name=bytemarket-api
 
-# Banco de Dados (Suas credenciais REAIS)
+# Banco de Dados (Use valores genéricos aqui)
 spring.datasource.url=jdbc:postgresql://localhost:5432/bytemarket
-
 spring.datasource.username=postgres
-spring.datasource.password=janeiro17
+spring.datasource.password=sua_senha_local
 
 # JPA
 spring.jpa.show-sql=true
@@ -12,10 +11,10 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.hibernate.ddl-auto=update
 
-# JWT (A chave real que geramos antes)
-jwt.secret=DKzRPRn6ESHKWCiw/0nWWYkzZzraowKT3YiNQ4IV8DvXzGaifbth1GcnFRBWnJ9qDr0HbdFmsyoOp/M2ujiaag==
+# JWT (Chave vazia ou de exemplo)
+jwt.secret=INSIRA_SUA_CHAVE_BASE64_AQUI
 jwt.expiration=86400000
 
-# Admin Seeder (Senha real ou fallback de dev)
+# Admin Seeder
 admin.email=admin@bytemarket.com
-admin.password=${ADMIN_PASSWORD:adminMurphy123}
+admin.password=${ADMIN_PASSWORD:senha_segura_aqui}

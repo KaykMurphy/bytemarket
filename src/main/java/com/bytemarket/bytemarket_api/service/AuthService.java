@@ -1,5 +1,6 @@
 package com.bytemarket.bytemarket_api.service;
 
+import com.bytemarket.bytemarket_api.domain.Role;
 import com.bytemarket.bytemarket_api.domain.User;
 import com.bytemarket.bytemarket_api.dto.LoginRequestDTO;
 import com.bytemarket.bytemarket_api.dto.LoginResponseDTO;
@@ -12,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +47,7 @@ public class AuthService {
         newUser.setEmail(request.email());
         newUser.setPassword(passwordEncoder.encode(request.password()));
 
-        // CORREÇÃO: Define o role diretamente (sem List.of)
-        newUser.setRole(request.role());
+        newUser.setRole(Role.USER);
 
         return userRepository.save(newUser);
     }
