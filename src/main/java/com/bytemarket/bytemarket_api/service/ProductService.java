@@ -1,7 +1,7 @@
 package com.bytemarket.bytemarket_api.service;
 
 import com.bytemarket.bytemarket_api.domain.Product;
-import com.bytemarket.bytemarket_api.dto.ProductResponseDTO;
+import com.bytemarket.bytemarket_api.dto.response.ProductResponseDTO;
 import com.bytemarket.bytemarket_api.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

@@ -22,9 +22,16 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Instant moment;
+
     private BigDecimal total;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(nullable = false)
+    private String deliveryEmail; // Email para enviar as contas
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -32,7 +39,4 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
-
 }
-
-

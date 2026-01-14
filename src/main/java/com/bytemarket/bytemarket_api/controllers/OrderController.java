@@ -1,9 +1,8 @@
 package com.bytemarket.bytemarket_api.controllers;
 
 
-import com.bytemarket.bytemarket_api.dto.OrderItemReceiptResponseDTO;
-import com.bytemarket.bytemarket_api.dto.OrderReceiptDTO;
-import com.bytemarket.bytemarket_api.dto.OrderRequestDTO;
+import com.bytemarket.bytemarket_api.dto.response.OrderReceiptDTO;
+import com.bytemarket.bytemarket_api.dto.request.OrderRequestDTO;
 import com.bytemarket.bytemarket_api.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

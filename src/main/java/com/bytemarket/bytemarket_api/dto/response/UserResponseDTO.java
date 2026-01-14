@@ -1,4 +1,4 @@
-package com.bytemarket.bytemarket_api.dto;
+package com.bytemarket.bytemarket_api.dto.response;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package com.bytemarket.bytemarket_api.controllers;
 
-import com.bytemarket.bytemarket_api.dto.ProductResponseDTO;
+import com.bytemarket.bytemarket_api.dto.response.ProductResponseDTO;
 import com.bytemarket.bytemarket_api.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

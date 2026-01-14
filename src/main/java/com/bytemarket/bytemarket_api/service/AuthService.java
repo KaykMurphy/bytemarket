@@ -2,9 +2,9 @@ package com.bytemarket.bytemarket_api.service;
 
 import com.bytemarket.bytemarket_api.domain.Role;
 import com.bytemarket.bytemarket_api.domain.User;
-import com.bytemarket.bytemarket_api.dto.LoginRequestDTO;
-import com.bytemarket.bytemarket_api.dto.LoginResponseDTO;
-import com.bytemarket.bytemarket_api.dto.RegisterRequestDTO;
+import com.bytemarket.bytemarket_api.dto.request.LoginRequestDTO;
+import com.bytemarket.bytemarket_api.dto.response.LoginResponseDTO;
+import com.bytemarket.bytemarket_api.dto.request.RegisterRequestDTO;
 import com.bytemarket.bytemarket_api.repository.UserRepository;
 import com.bytemarket.bytemarket_api.security.JwtUtils;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,5 @@
-package com.bytemarket.bytemarket_api.dto;
+package com.bytemarket.bytemarket_api.dto.response;
 
-import com.bytemarket.bytemarket_api.domain.ProductType;
 import java.math.BigDecimal;
 import java.util.List;
 

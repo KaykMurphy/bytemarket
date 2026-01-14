@@ -1,10 +1,10 @@
 package com.bytemarket.bytemarket_api.service;
 
 import com.bytemarket.bytemarket_api.domain.*;
-import com.bytemarket.bytemarket_api.dto.OrderItemDTO;
-import com.bytemarket.bytemarket_api.dto.OrderItemReceiptResponseDTO;
-import com.bytemarket.bytemarket_api.dto.OrderReceiptDTO;
-import com.bytemarket.bytemarket_api.dto.OrderRequestDTO;
+import com.bytemarket.bytemarket_api.dto.request.OrderItemDTO;
+import com.bytemarket.bytemarket_api.dto.response.OrderItemReceiptResponseDTO;
+import com.bytemarket.bytemarket_api.dto.response.OrderReceiptDTO;
+import com.bytemarket.bytemarket_api.dto.request.OrderRequestDTO;
 import com.bytemarket.bytemarket_api.exceptions.OutOfStockException;
 import com.bytemarket.bytemarket_api.repository.OrderRepository;
 import com.bytemarket.bytemarket_api.repository.ProductRepository;
