@@ -3,48 +3,46 @@ package com.bytemarket.bytemarket_api.service;
 import com.bytemarket.bytemarket_api.domain.Product;
 import com.bytemarket.bytemarket_api.dto.response.ProductResponseDTO;
 import com.bytemarket.bytemarket_api.repository.ProductRepository;
+import com.bytemarket.bytemarket_api.validation.StockValidator;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final StockValidator stockValidator;
 
-
-    @Transactional
-    public Page<ProductResponseDTO> findAll(Pageable pageable){
-
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> findAll(Pageable pageable) {
         return productRepository.findAll(pageable)
-                .map(product -> new ProductResponseDTO(
-                        product.getId(),
-                        product.getTitle(),
-                        product.getPrice(),
-                        product.getImageUrl(),
-                        product.getType()
-                ));
+                .map(this::mapToResponse);
     }
 
-    @Transactional
-    public ProductResponseDTO findById(Long id){
-
+    @Transactional(readOnly = true)
+    public ProductResponseDTO findById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: "+id));
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + id));
+
+        return mapToResponse(product);
+    }
+
+    private ProductResponseDTO mapToResponse(Product product) {
+        long availableStock = stockValidator.getAvailableStock(product);
 
         return new ProductResponseDTO(
                 product.getId(),
                 product.getTitle(),
+                product.getDescription(),
                 product.getPrice(),
                 product.getImageUrl(),
-                product.getType()
+                product.getType(),
+                availableStock
         );
-
     }
-
-
 }

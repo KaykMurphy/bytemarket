@@ -4,6 +4,7 @@ import com.bytemarket.bytemarket_api.dto.request.LoginRequestDTO;
 import com.bytemarket.bytemarket_api.dto.response.LoginResponseDTO;
 import com.bytemarket.bytemarket_api.dto.request.RegisterRequestDTO;
 import com.bytemarket.bytemarket_api.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,13 +20,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO body) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO body) {
         LoginResponseDTO token = authService.login(body);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequestDTO body) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequestDTO body) {
         authService.register(body);
         return ResponseEntity.ok("Usuário registrado com sucesso");
     }
