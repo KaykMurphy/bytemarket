@@ -31,9 +31,9 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StockItemRepository stockItemRepository;
     private final OrderRepository orderRepository;
-    private final PaymentStrategy paymentStrategy;
     private final EmailValidator emailValidator;
     private final StockValidator stockValidator;
+    private final EmailService emailService;
 
     @Transactional
     public OrderReceiptDTO placeOrder(OrderRequestDTO dto) {
@@ -88,16 +88,11 @@ public class OrderService {
             orderItems.add(new OrderItem(null, quantity, product.getPrice(), null, product));
         }
 
-        // Processar pagamento
-        if (!paymentStrategy.processPayment(total)) {
-            throw new RuntimeException("Pagamento não autorizado");
-        }
-
-        // Criar pedido
+        // Criar pedido (status WAITING_PAYMENT)
         Order order = new Order();
         order.setMoment(Instant.now());
         order.setTotal(total);
-        order.setStatus(Status.PAID);
+        order.setStatus(Status.WAITING_PAYMENT); // Aguardando pagamento PIX
         order.setDeliveryEmail(dto.deliveryEmail());
         order.setUser(user);
         order.setItems(orderItems);
@@ -107,7 +102,10 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // TODO: Enviar email com as contas (implementar EmailService)
+        // Enviar email com as contas (apenas se já foram reservadas)
+        if (!codesPerItem.isEmpty() && codesPerItem.stream().anyMatch(list -> !list.isEmpty())) {
+            emailService.sendOrderConfirmation(savedOrder, codesPerItem);
+        }
 
         return buildReceipt(savedOrder, codesPerItem);
     }
