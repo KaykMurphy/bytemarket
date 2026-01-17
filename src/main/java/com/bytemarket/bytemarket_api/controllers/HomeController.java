@@ -16,16 +16,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model, Pageable pageable) {
         model.addAttribute("products", productService.findAll(pageable));
-        return "home";
-    }
+        return "index";
 
-    @GetMapping("/login")
-    public String login() {
-        return "auth/login";
-    }
-
-    @GetMapping("/register")
-    public String register() {
-        return "auth/register";
-    }
+}
 }
