@@ -1,244 +1,441 @@
-# ByteMarket API
+# 🛒 ByteMarket API
 
-Uma API REST robusta e escalável para uma plataforma de marketplace digital, construída com Spring Boot e práticas modernas de Java.
+> API REST completa para marketplace de produtos digitais com pagamento PIX via Mercado Pago
 
-## 📋 Visão Geral
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue.svg)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-ByteMarket é uma solução backend projetada para venda de produtos digitais com entrega automática. A plataforma suporta gerenciamento de inventário, processamento de pedidos e entrega instantânea de conteúdo digital como credenciais de login, chaves de licença e códigos de acesso.
+---
 
-## 🏗️ Arquitetura
+## 📖 Índice
 
-O projeto segue um padrão de arquitetura em camadas com clara separação de responsabilidades:
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Funcionalidades](#-funcionalidades)
+- [Tecnologias](#-tecnologias)
+- [Pré-requisitos](#-pré-requisitos)
+- [Instalação](#-instalação)
+- [Configuração](#-configuração)
+- [Executando](#-executando)
+- [Documentação da API](#-documentação-da-api)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Testes](#-testes)
+- [Deploy](#-deploy)
+- [Contribuindo](#-contribuindo)
+- [Licença](#-licença)
 
-```
-├── controllers/     # Endpoints REST e manipulação de requisições
-├── services/        # Lógica de negócio e orquestração
-├── repositories/    # Camada de acesso a dados
-├── domain/          # Modelos de entidade e objetos de negócio
-└── dto/             # Objetos de Transferência de Dados
-```
+---
 
-### Principais Padrões de Projeto
+## 🎯 Sobre o Projeto
 
-- **Strategy Pattern**: Processamento de pagamento flexível através da interface `PaymentStrategy`
-- **Repository Pattern**: Abstração limpa de acesso a dados com Spring Data JPA
-- **DTO Pattern**: Contratos de API desacoplados dos modelos de domínio internos
+ByteMarket é uma API REST robusta para criação de marketplaces de produtos digitais (contas de streaming, softwares, etc.) com:
 
-## 🚀 Funcionalidades
+- ✅ Autenticação JWT segura
+- 💳 Pagamento PIX real via Mercado Pago
+- 📧 Envio automático de produtos por email
+- 🔔 Webhooks para confirmação de pagamento
+- 📦 Gestão automática de estoque
+- 🔐 Sistema de roles (USER/ADMIN)
+- 📚 Documentação Swagger/OpenAPI
 
-### Implementação Atual
+---
 
-- ✅ Gerenciamento de catálogo de produtos com paginação
-- ✅ Sistema de controle de inventário digital
-- ✅ Processamento automatizado de pedidos
-- ✅ Entrega instantânea de conteúdo digital
-- ✅ Bloqueio otimista para itens de estoque
-- ✅ Suporte a múltiplos tipos de produto (entrega automática e serviços)
-- ✅ Geração de recibo de pedido com conteúdo entregue
+## ✨ Funcionalidades
 
-### Tipos de Produto
+### 👤 Para Usuários
+- Registro e login com JWT
+- Listagem de produtos com paginação
+- Criação de pedidos
+- Pagamento via PIX (QR Code)
+- Recebimento automático de produtos por email
+- Histórico de pedidos
 
-- **AUTOMATIC_DELIVERY**: Produtos digitais com entrega instantânea (contas, chaves, códigos)
-- **SERVICE**: Produtos baseados em serviço sem inventário físico
+### 👨‍💼 Para Administradores
+- CRUD completo de produtos
+- Gestão de estoque (adicionar contas digitais)
+- Visualização de status de estoque
+- Controle de vendas
 
-## 🛠️ Stack Tecnológico
+### 🔄 Automações
+- Envio automático de contas após pagamento
+- Atualização de estoque em tempo real
+- Webhooks do Mercado Pago
+- Validação HMAC de webhooks
 
-- **Java 17+**
-- **Spring Boot 3.x**
-- **Spring Data JPA**
-- **PostgreSQL**
+---
+
+## 🛠 Tecnologias
+
+### Backend
+- **Java 17**
+- **Spring Boot 3.4.2**
+  - Spring Data JPA
+  - Spring Security
+  - Spring Validation
+  - Spring Mail
+- **PostgreSQL** (Produção)
+- **H2** (Desenvolvimento)
+
+### Pagamento & Comunicação
+- **Mercado Pago SDK 2.1.28**
+- **JWT (JJWT 0.12.5)**
+- **Thymeleaf** (Templates de email)
+
+### Documentação
+- **Springdoc OpenAPI 2.7.0** (Swagger)
+
+### Utilitários
 - **Lombok**
 - **Maven**
 
-## 📦 Instalação
+---
 
-### Pré-requisitos
+## 📋 Pré-requisitos
 
-- JDK 17 ou superior
-- PostgreSQL 12+
-- Maven 3.9+
-
-### Configuração
-
-1. Clone o repositório:
 ```bash
-git clone https://github.com/seuusuario/bytemarket-api.git
+# Java 17+
+java -version
+
+# Maven 3.9+
+mvn -version
+
+# PostgreSQL (opcional, pode usar H2)
+psql --version
+
+# Git
+git --version
+```
+
+---
+
+## 🚀 Instalação
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/KaykMurphy/bytemarket-api.git
 cd bytemarket-api
 ```
 
-2. Configure a conexão com o banco de dados em `application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/bytemarket
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-```
+### 2. Instale as dependências
 
-3. Compile o projeto:
 ```bash
 mvn clean install
 ```
 
-4. Execute a aplicação:
+---
+
+## ⚙️ Configuração
+
+### 1. Crie o arquivo `application.properties`
+
+Copie o arquivo exemplo e configure:
+
+```bash
+cp src/main/resources/application.properties.example src/main/resources/application.properties
+```
+
+### 2. Configure as variáveis obrigatórias
+
+```properties
+# JWT Secret (gere uma chave base64)
+jwt.secret=dGhpc2lzYXZlcnlzZWNyZXRrZXlmb3Jqd3RhdXRoZW50aWNhdGlvbg==
+jwt.expiration=86400000
+
+# Admin (será criado automaticamente)
+admin.email=admin@bytemarket.com
+admin.password=suaSenhaSegura123
+
+# Banco de Dados (H2 em memória para desenvolvimento)
+spring.datasource.url=jdbc:h2:mem:bytemarket
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create-drop
+```
+
+### 3. Configure Email (Opcional)
+
+Para envio de emails, configure o Gmail:
+
+```properties
+spring.mail.username=seu-email@gmail.com
+spring.mail.password=sua-senha-app
+
+# Como obter senha de app:
+# https://myaccount.google.com/apppasswords
+```
+
+### 4. Configure Mercado Pago (Opcional)
+
+Para pagamentos PIX reais:
+
+```properties
+payment.mercadopago.access-token=TEST-seu-token-aqui
+payment.mercadopago.public-key=TEST-sua-public-key
+payment.mercadopago.webhook-secret=seu-webhook-secret
+
+# Obtenha em: https://www.mercadopago.com.br/developers/panel/credentials
+```
+
+---
+
+## ▶️ Executando
+
+### Desenvolvimento
+
 ```bash
 mvn spring-boot:run
 ```
 
-A API estará disponível em `http://localhost:8080`
+A aplicação estará disponível em: **http://localhost:8080**
 
-## 📚 Endpoints da API
+### Produção
 
-### Produtos
+```bash
+# Compilar
+mvn clean package -DskipTests
 
+# Executar
+java -jar target/bytemarket-api-0.0.1-SNAPSHOT.jar
+```
+
+---
+
+## 📚 Documentação da API
+
+### Swagger UI
+
+Acesse a documentação interativa:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+### Endpoints Principais
+
+#### Autenticação
 ```http
-GET /products?page=0&size=10
+POST /auth/register - Registrar usuário
+POST /auth/login    - Login
 ```
 
-Retorna uma lista paginada de produtos disponíveis.
-
-**Resposta:**
-```json
-{
-  "content": [
-    {
-      "id": 1,
-      "title": "Conta Netflix Premium",
-      "price": 29.90,
-      "imageUrl": "https://example.com/image.jpg",
-      "type": "AUTOMATIC_DELIVERY"
-    }
-  ],
-  "pageable": {...},
-  "totalElements": 100
-}
-```
-
-### Pedidos
-
+#### Produtos (Público)
 ```http
-POST /orders
+GET  /products      - Listar produtos
+GET  /products/{id} - Detalhes do produto
 ```
 
-Cria um novo pedido e processa o pagamento.
-
-**Requisição:**
-```json
-{
-  "userId": "123e4567-e89b-12d3-a456-426614174000",
-  "items": [
-    {
-      "productId": 1,
-      "quantity": 2
-    }
-  ]
-}
+#### Pedidos (Autenticado)
+```http
+POST /orders        - Criar pedido
+GET  /users/{userId}/orders - Histórico de pedidos
 ```
 
-**Resposta:**
-```json
-{
-  "id": 1,
-  "moment": "2025-01-15T10:30:00Z",
-  "total": 59.80,
-  "status": "PAID",
-  "items": [
-    {
-      "title": "Conta Netflix Premium",
-      "quantity": 2,
-      "price": 29.90,
-      "deliveredContent": [
-        "login1:password1",
-        "login2:password2"
-      ]
-    }
-  ]
-}
+#### Pagamentos (Autenticado)
+```http
+POST /payments/pix/orders/{orderId} - Gerar PIX
+GET  /payments/{paymentId}          - Status do pagamento
 ```
 
-## 🗄️ Esquema do Banco de Dados
-
-### Entidades Principais
-
-- **User**: Informações do cliente e autenticação
-- **Product**: Itens da vitrine (catálogo)
-- **StockItem**: Conteúdo digital real (segredos/credenciais)
-- **Order**: Transações de compra
-- **OrderItem**: Itens de linha dentro de um pedido
-
-### Relacionamentos das Entidades
-
-```
-User 1---* Order
-Order 1---* OrderItem
-OrderItem *---1 Product
-Product 1---* StockItem
+#### Admin (Requer ROLE_ADMIN)
+```http
+POST   /admin/products              - Criar produto
+PUT    /admin/products/{id}         - Atualizar produto
+DELETE /admin/products/{id}         - Deletar produto
+POST   /admin/products/{id}/stock   - Adicionar estoque
+GET    /admin/products/{id}/stock/status - Status do estoque
 ```
 
-## 🔒 Considerações de Segurança
+---
 
-> ⚠️ **Nota**: Este projeto está em desenvolvimento ativo. Recursos de segurança estão sendo implementados.
+## 📂 Estrutura do Projeto
 
-Lacunas de segurança sendo abordadas:
-- Mecanismos de autenticação e autorização
-- Criptografia de senhas (BCrypt)
-- Limitação de taxa de API
-- Criptografia de conteúdo para dados sensíveis
-- Validação e sanitização de entrada
+```
+bytemarket-api/
+│
+├── src/main/java/com/bytemarket/bytemarket_api/
+│   ├── config/              # Configurações (Security, Swagger, Email, MP)
+│   ├── controllers/         # Controllers REST
+│   ├── domain/              # Entidades JPA
+│   ├── dto/                 # DTOs (Request/Response)
+│   ├── exceptions/          # Tratamento de exceções
+│   ├── repository/          # Repositories JPA
+│   ├── security/            # JWT, UserDetails, Filters
+│   ├── service/             # Lógica de negócio
+│   └── validation/          # Validadores customizados
+│
+├── src/main/resources/
+│   ├── templates/email/     # Templates Thymeleaf
+│   └── application.properties
+│
+└── src/test/                # Testes unitários/integração
+```
+
+---
 
 ## 🧪 Testes
 
-Execute os testes unitários:
+### Executar todos os testes
+
 ```bash
 mvn test
 ```
 
-Execute os testes de integração:
+### Testar manualmente com cURL
+
+#### 1. Registrar usuário
 ```bash
-mvn verify
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "João Silva",
+    "email": "joao@email.com",
+    "password": "senha123"
+  }'
 ```
 
-## 📈 Desenvolvimento Futuro
+#### 2. Login
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "joao@email.com",
+    "password": "senha123"
+  }'
+```
 
-Este projeto está em desenvolvimento ativo. Funcionalidades e melhorias planejadas são rastreadas na seção [Issues](../../issues).
-
-### Destaques do Roadmap
-
-- 🔐 Integração com Spring Security
-- 🔑 Autenticação baseada em JWT
-- 💳 Integração com gateway de pagamento real
-- 📧 Notificações por email
-- 📊 Endpoints de painel administrativo
-- 🔍 Busca e filtragem avançadas
-- 📦 Suporte a webhooks para atualizações de pedidos
-- 🌐 Documentação da API com Swagger/OpenAPI
-- ⚡ Camada de cache com Redis
-- 📈 Monitoramento e observabilidade
-
-Confira a página de [Issues](../../issues) para solicitações de recursos detalhadas e relatórios de bugs.
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Sinta-se à vontade para enviar um Pull Request.
-
-1. Faça um fork do projeto
-2. Crie sua branch de feature (`git checkout -b feature/NovaFuncionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
-5. Abra um Pull Request
-
-## 👤 Autor
-
-**Kayk Edmar**
-
-- GitHub: [@KaykMurphy](https://github.com/KaykMurphy)
-- LinkedIn: [Kayk Edmar](https://www.linkedin.com/in/kayk-edmar/)
-
-## 🙏 Agradecimentos
-
-- Comunidade Spring Boot pela excelente documentação
-- Contribuidores que ajudam a melhorar este projeto
+#### 3. Listar produtos
+```bash
+curl http://localhost:8080/products
+```
 
 ---
 
-**Status**: 🚧 Em Desenvolvimento Ativo
+## 🚢 Deploy
 
-Para dúvidas ou suporte, por favor abra uma issue ou entre em contato com os mantenedores.
+### Heroku
+
+```bash
+# Login
+heroku login
+
+# Criar app
+heroku create bytemarket-api
+
+# Adicionar PostgreSQL
+heroku addons:create heroku-postgresql:mini
+
+# Configurar variáveis
+heroku config:set JWT_SECRET=sua-chave-aqui
+heroku config:set ADMIN_PASSWORD=senha-admin
+
+# Deploy
+git push heroku main
+```
+
+### Docker
+
+```dockerfile
+# Dockerfile
+FROM eclipse-temurin:17-jdk-alpine
+VOLUME /tmp
+COPY target/*.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+```
+
+```bash
+# Build
+docker build -t bytemarket-api .
+
+# Run
+docker run -p 8080:8080 \
+  -e JWT_SECRET=sua-chave \
+  -e ADMIN_PASSWORD=senha \
+  bytemarket-api
+```
+
+---
+
+## 🔐 Segurança
+
+- ✅ Senhas criptografadas com BCrypt
+- ✅ Autenticação JWT com expiração
+- ✅ Validação HMAC de webhooks
+- ✅ Validação de entrada com Bean Validation
+- ✅ CORS configurado
+- ✅ Rate limiting (recomendado para produção)
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas!
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 👨‍💻 Autor
+
+Desenvolvido com ❤️ por **Kayk Edmar**
+
+- GitHub: [@KaykMurphy](https://github.com/KaykMurphy)
+- LinkedIn: [Kayk Edmar](https://www.linkedin.com/in/kayk-edmar/)
+- Portfolio: [github.com/KaykMurphy](https://github.com/KaykMurphy)
+
+---
+
+## 🙏 Agradecimentos
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Mercado Pago Developers](https://www.mercadopago.com.br/developers)
+- [Swagger](https://swagger.io/)
+- Comunidade open-source
+
+---
+
+## 📞 Suporte
+
+Encontrou um bug? Tem uma sugestão?
+
+- 🐛 [Reportar Bug](https://github.com/KaykMurphy/bytemarket-api/issues)
+- 💡 [Sugerir Feature](https://github.com/KaykMurphy/bytemarket-api/issues)
+- 💬 [Discussões](https://github.com/KaykMurphy/bytemarket-api/discussions)
+
+---
+
+## 📊 Status do Projeto
+
+✅ **Em Desenvolvimento Ativo**
+
+### Roadmap
+
+- [x] Autenticação JWT
+- [x] CRUD de produtos
+- [x] Pagamento PIX
+- [x] Webhooks
+- [x] Envio de emails
+- [x] Documentação Swagger
+- [ ] Dashboard administrativo
+- [ ] Notificações em tempo real
+- [ ] Sistema de cupons
+- [ ] Avaliações de produtos
+
+---
+
+<div align="center">
+
+**⭐ Se este projeto te ajudou, deixe uma estrela!**
+
+</div>
