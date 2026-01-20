@@ -1,112 +1,1873 @@
-package com.bytemarket.bytemarket_api.service;
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - ByteMarket' : 'ByteMarket - Marketplace Digital'}">ByteMarket</title>
 
-import com.bytemarket.bytemarket_api.domain.Product;
-import com.bytemarket.bytemarket_api.domain.StockItem;
-import com.bytemarket.bytemarket_api.dto.request.ProductCreateDTO;
-import com.bytemarket.bytemarket_api.dto.request.ProductUpdateDTO;
-import com.bytemarket.bytemarket_api.dto.request.StockItemCreateDTO;
-import com.bytemarket.bytemarket_api.dto.response.ProductResponseDTO;
-import com.bytemarket.bytemarket_api.dto.response.StockStatusDTO;
-import com.bytemarket.bytemarket_api.repository.ProductRepository;
-import com.bytemarket.bytemarket_api.repository.StockItemRepository;
-import com.bytemarket.bytemarket_api.validation.StockValidator;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+            --card-bg: #1e1e1e;
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8f9fa;
+            --text-muted: #adb5bd;
+            --gradient-primary: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            --gradient-success: linear-gradient(135deg, #198754, #157347);
+            --gradient-danger: linear-gradient(135deg, #dc3545, #c82333);
+        }
 
-import java.util.List;
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-@Service
-@RequiredArgsConstructor
-public class AdminProductService {
+        /* Navbar */
+        .navbar-byte {
+            background-color: rgba(18, 18, 18, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+        }
 
-private final ProductRepository productRepository;
-private final StockItemRepository stockItemRepository;
-private final StockValidator stockValidator;
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-@Transactional
-public ProductResponseDTO createProduct(ProductCreateDTO dto) {
-Product product = new Product();
-product.setTitle(dto.title());
-product.setDescription(dto.description());
-product.setPrice(dto.price());
-product.setImageUrl(dto.imageUrl());
-product.setType(dto.type());
+        /* Cards */
+        .card-market {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+        }
 
-Product saved = productRepository.save(product);
+        .card-market:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(13, 110, 253, 0.3);
+        }
 
-return mapToResponse(saved);
-}
+        .card-market-img {
+            height: 220px;
+            object-fit: cover;
+            width: 100%;
+        }
 
-@Transactional
-public ProductResponseDTO updateProduct(Long id, ProductUpdateDTO dto) {
-Product product = productRepository.findById(id)
-.orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + id));
+        .badge-stock {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 12px;
+            font-weight: 600;
+            border-radius: 20px;
+        }
 
-if (dto.title() != null) product.setTitle(dto.title());
-if (dto.description() != null) product.setDescription(dto.description());
-if (dto.price() != null) product.setPrice(dto.price());
-if (dto.imageUrl() != null) product.setImageUrl(dto.imageUrl());
-if (dto.type() != null) product.setType(dto.type());
+        /* Buttons */
+        .btn-market {
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: none;
+        }
 
-Product updated = productRepository.save(product);
+        .btn-market-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
 
-return mapToResponse(updated);
-}
+        .btn-market-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
 
-@Transactional
-public void deleteProduct(Long id) {
-if (!productRepository.existsById(id)) {
-throw new EntityNotFoundException("Produto não encontrado: " + id);
-}
-productRepository.deleteById(id);
-}
+        .btn-market-success {
+            background: var(--gradient-success);
+            color: white;
+        }
 
-@Transactional
-public void addStockItems(Long productId, List<StockItemCreateDTO> items) {
-    Product product = productRepository.findById(productId)
-    .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + productId));
+        .btn-market-danger {
+            background: var(--gradient-danger);
+            color: white;
+        }
 
-    for (StockItemCreateDTO itemDto : items) {
-    StockItem stockItem = new StockItem();
-    stockItem.setContent(itemDto.content());
-    stockItem.setSold(false);
-    stockItem.setProduct(product);
+        /* QR Code Container */
+        .qrcode-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
 
-    stockItemRepository.save(stockItem);
+        /* Product Details */
+        .product-detail-img {
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Forms */
+        .form-market {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .form-control-market {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 12px 15px;
+        }
+
+        .form-control-market:focus {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            color: var(--text-light);
+        }
+
+        /* Tables */
+        .table-market {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-market thead th {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .table-market tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.3s;
+        }
+
+        .table-market tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .status-waiting {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-paid {
+            background-color: rgba(25, 135, 84, 0.2);
+            color: #198754;
+        }
+
+        /* Footer */
+        .footer-byte {
+            background-color: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        /* Animation for payment status */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(18, 18, 18, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(102, 16, 242, 0.1));
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Alert Custom */
+        .alert-market {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+<!-- NAVBAR (comum a todas as telas) -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-byte fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-shop me-2"></i>ByteMarket
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-house-door me-1"></i>Home
+                    </a>
+                </li>
+
+                <!-- Usuário logado -->
+                <div th:if="${user != null}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/orders">
+                            <i class="bi bi-receipt me-1"></i>Meus Pedidos
+                        </a>
+                    </li>
+                </div>
+
+                <!-- Admin -->
+                <div th:if="${user != null && user.role == 'ADMIN'}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear me-1"></i>Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/admin/products">
+                                <i class="bi bi-box-seam me-2"></i>Gerenciar Produtos
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/admin/stock">
+                                <i class="bi bi-plus-circle me-2"></i>Adicionar Estoque
+                            </a></li>
+                        </ul>
+                    </li>
+                </div>
+            </ul>
+
+            <!-- Lado direito -->
+            <div class="d-flex align-items-center">
+                <!-- Se usuário logado -->
+                <div th:if="${user != null}" class="me-3">
+                        <span class="text-light">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span th:text="${user.name}">Usuário</span>
+                        </span>
+                </div>
+
+                <!-- Botões Login/Logout -->
+                <div th:if="${user == null}">
+                    <a href="/auth/login" class="btn btn-outline-light btn-sm me-2">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                    </a>
+                    <a href="/auth/register" class="btn btn-market btn-market-primary btn-sm">
+                        <i class="bi bi-person-plus me-1"></i>Registrar
+                    </a>
+                </div>
+                <div th:if="${user != null}">
+                    <a href="/auth/logout" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-right me-1"></i>Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="container mt-5 pt-4">
+
+    <!-- ========== HOME PAGE ========== -->
+    <div th:if="${page == 'home'}" class="main-content">
+        <!-- Hero Section -->
+        <div class="hero-section text-center">
+            <h1 class="display-5 fw-bold mb-3">
+                <i class="bi bi-lightning-charge text-primary"></i>
+                Marketplace Digital
+            </h1>
+            <p class="lead mb-4">
+                Compre contas de streaming, softwares e muito mais com segurança e entrega instantânea!
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-center gap-2">
+                            <span class="badge bg-primary px-3 py-2">
+                                <i class="bi bi-shield-check me-1"></i>Pagamento Seguro
+                            </span>
+                        <span class="badge bg-success px-3 py-2">
+                                <i class="bi bi-lightning me-1"></i>Entrega Instantânea
+                            </span>
+                        <span class="badge bg-info px-3 py-2">
+                                <i class="bi bi-headset me-1"></i>Suporte 24/7
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros (simulado) -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                        <span class="input-group-text bg-dark text-light border-secondary">
+                            <i class="bi bi-search"></i>
+                        </span>
+                    <input type="text" class="form-control form-control-market" placeholder="Buscar produtos...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-control-market">
+                    <option>Todos os tipos</option>
+                    <option>Streaming</option>
+                    <option>Jogos</option>
+                    <option>Software</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-control-market">
+                    <option>Ordenar por: Popular</option>
+                    <option>Menor preço</option>
+                    <option>Maior preço</option>
+                    <option>Novidades</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Grid de Produtos -->
+        <h2 class="mb-4">
+            <i class="bi bi-grid-3x3-gap text-primary me-2"></i>
+            Produtos em Destaque
+        </h2>
+
+        <div class="row g-4">
+            <!-- Exemplo de produto 1 -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card card-market">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                             class="card-img-top card-market-img" alt="Netflix Premium">
+                        <span class="badge-stock bg-success">Em estoque</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Netflix Premium</h5>
+                        <p class="card-text text-muted small">
+                            Conta Premium 4K, 1 mês de acesso, 4 telas simultâneas
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="h4 text-success mb-0">R$ 49,90</span>
+                                <span class="badge bg-dark">Streaming</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="/web/products/1" class="btn btn-market btn-market-primary">
+                                    <i class="bi bi-eye me-1"></i>Ver Detalhes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exemplo de produto 2 -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card card-market">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                             class="card-img-top card-market-img" alt="Spotify Family">
+                        <span class="badge-stock bg-success">Em estoque</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Spotify Family</h5>
+                        <p class="card-text text-muted small">
+                            Plano Familiar, 6 contas premium, 1 ano de acesso
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="h4 text-success mb-0">R$ 299,90</span>
+                                <span class="badge bg-dark">Streaming</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="/web/products/2" class="btn btn-market btn-market-primary">
+                                    <i class="bi bi-eye me-1"></i>Ver Detalhes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exemplo de produto 3 (Esgotado) -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card card-market opacity-75">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                             class="card-img-top card-market-img" alt="Windows 11 Pro">
+                        <span class="badge-stock bg-danger">Esgotado</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Windows 11 Pro</h5>
+                        <p class="card-text text-muted small">
+                            Licença digital permanente, chave original Microsoft
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="h4 text-muted mb-0">R$ 399,90</span>
+                                <span class="badge bg-secondary">Software</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-market btn-secondary" disabled>
+                                    <i class="bi bi-x-circle me-1"></i>Esgotado
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exemplo de produto 4 -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card card-market">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                             class="card-img-top card-market-img" alt="Adobe Creative Cloud">
+                        <span class="badge-stock bg-success">Últimas unidades</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Adobe Creative Cloud</h5>
+                        <p class="card-text text-muted small">
+                            Todos os Apps Adobe, 1 ano, conta compartilhada
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="h4 text-success mb-0">R$ 599,90</span>
+                                <span class="badge bg-info">Design</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="/web/products/4" class="btn btn-market btn-market-primary">
+                                    <i class="bi bi-eye me-1"></i>Ver Detalhes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paginação -->
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link bg-dark text-light border-secondary">Anterior</a>
+                </li>
+                <li class="page-item active">
+                    <a class="page-link bg-primary border-primary">1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-light border-secondary">2</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-light border-secondary">3</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-light border-secondary">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- ========== DETALHES DO PRODUTO ========== -->
+    <div th:if="${page == 'product-details'}" class="main-content">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="text-primary">Home</a></li>
+                <li class="breadcrumb-item active text-light">Detalhes do Produto</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <!-- Imagem do Produto -->
+            <div class="col-lg-6 mb-4">
+                <img th:src="${product.imageUrl}"
+                     class="img-fluid product-detail-img w-100"
+                     alt="Imagem do produto">
+            </div>
+
+            <!-- Informações do Produto -->
+            <div class="col-lg-6">
+                <div class="card card-market">
+                    <div class="card-body">
+                        <h1 class="h2 mb-3" th:text="${product.title}">Netflix Premium</h1>
+
+                        <div class="mb-4">
+                            <span class="badge bg-dark fs-6 mb-3" th:text="${product.type}">Streaming</span>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="text-success h3 mb-0" th:text="'R$ ' + ${#numbers.formatDecimal(product.price, 1, 2)}">R$ 49,90</span>
+                                <span th:if="${product.availableStock > 0}"
+                                      class="badge bg-success ms-3 fs-6">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Em estoque: <span th:text="${product.availableStock}">15</span>
+                                    </span>
+                                <span th:if="${product.availableStock <= 0}"
+                                      class="badge bg-danger ms-3 fs-6">
+                                        <i class="bi bi-x-circle me-1"></i>Esgotado
+                                    </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-2">
+                                <i class="bi bi-info-circle text-primary me-2"></i>Descrição
+                            </h5>
+                            <p class="text-light" th:text="${product.description}">
+                                Conta Netflix Premium com acesso a todo o catálogo em 4K.
+                                Permite 4 telas simultâneas. Entrega instantânea após a confirmação do pagamento.
+                            </p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-shield-check text-success me-2"></i>Garantia
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Entrega instantânea por email
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Suporte 30 dias
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Reembolso em 24h se não funcionar
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Formulário de Compra -->
+                        <form th:action="@{/orders}" method="POST" th:if="${user != null && product.availableStock > 0}">
+                            <input type="hidden" name="userId" th:value="${user.id}">
+                            <input type="hidden" name="deliveryEmail" th:value="${user.email}">
+                            <input type="hidden" name="items[0].productId" th:value="${product.id}">
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Quantidade</label>
+                                    <select name="items[0].quantity" class="form-select form-control-market">
+                                        <option value="1">1 unidade</option>
+                                        <option value="2">2 unidades</option>
+                                        <option value="3">3 unidades</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-market btn-market-success btn-lg">
+                                    <i class="bi bi-cart-check me-2"></i>Comprar Agora
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Mensagens para não logado ou esgotado -->
+                        <div th:if="${user == null}" class="alert alert-market">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Faça <a href="/auth/login" class="text-primary">login</a> para comprar
+                        </div>
+
+                        <div th:if="${product.availableStock <= 0}" class="alert alert-danger">
+                            <i class="bi bi-x-circle me-2"></i>
+                            Este produto está temporariamente esgotado
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== LOGIN ========== -->
+    <div th:if="${page == 'login'}" class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card card-market">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h2>
+                                <i class="bi bi-box-arrow-in-right text-primary me-2"></i>
+                                Login
+                            </h2>
+                            <p class="text-muted">Entre na sua conta ByteMarket</p>
+                        </div>
+
+                        <!-- Mensagem de erro -->
+                        <div th:if="${param.error}" class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Email ou senha inválidos
+                        </div>
+
+                        <!-- Mensagem de logout -->
+                        <div th:if="${param.logout}" class="alert alert-success">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Você saiu com sucesso
+                        </div>
+
+                        <form th:action="@{/auth/login}" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                        <span class="input-group-text bg-dark text-light border-secondary">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                    <input type="email" name="email" class="form-control form-control-market"
+                                           placeholder="seu@email.com" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Senha</label>
+                                <div class="input-group">
+                                        <span class="input-group-text bg-dark text-light border-secondary">
+                                            <i class="bi bi-key"></i>
+                                        </span>
+                                    <input type="password" name="password" class="form-control form-control-market"
+                                           placeholder="Sua senha" required>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-market btn-market-primary btn-lg">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="text-muted mb-0">
+                                    Não tem uma conta?
+                                    <a href="/auth/register" class="text-primary">Registre-se</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== REGISTRO ========== -->
+    <div th:if="${page == 'register'}" class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card card-market">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h2>
+                                <i class="bi bi-person-plus text-primary me-2"></i>
+                                Criar Conta
+                            </h2>
+                            <p class="text-muted">Junte-se ao ByteMarket em menos de 1 minuto</p>
+                        </div>
+
+                        <form th:action="@{/auth/register}" method="POST">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Nome Completo</label>
+                                    <div class="input-group">
+                                            <span class="input-group-text bg-dark text-light border-secondary">
+                                                <i class="bi bi-person"></i>
+                                            </span>
+                                        <input type="text" name="name" class="form-control form-control-market"
+                                               placeholder="Seu nome" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                        <span class="input-group-text bg-dark text-light border-secondary">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                    <input type="email" name="email" class="form-control form-control-market"
+                                           placeholder="seu@email.com" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Senha</label>
+                                <div class="input-group">
+                                        <span class="input-group-text bg-dark text-light border-secondary">
+                                            <i class="bi bi-shield-lock"></i>
+                                        </span>
+                                    <input type="password" name="password" class="form-control form-control-market"
+                                           placeholder="Mínimo 6 caracteres" minlength="6" required>
+                                </div>
+                                <div class="form-text text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Use pelo menos 6 caracteres com letras e números
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-market btn-market-success btn-lg">
+                                    <i class="bi bi-person-check me-2"></i>Criar Conta
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="text-muted mb-0">
+                                    Já tem uma conta?
+                                    <a href="/auth/login" class="text-primary">Faça login</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CONFIRMAÇÃO DE PEDIDO ========== -->
+    <div th:if="${page == 'order-confirmation'}" class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-market">
+                    <div class="card-header bg-dark">
+                        <h3 class="mb-0">
+                            <i class="bi bi-cart-check text-success me-2"></i>
+                            Confirmação do Pedido
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Resumo do Pedido -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-receipt text-primary me-2"></i>
+                                Pedido #<span th:text="${order.id}">123</span>
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong>Data:</strong>
+                                        <span th:text="${#temporals.format(order.moment, 'dd/MM/yyyy HH:mm')}">01/01/2023 14:30</span>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Status:</strong>
+                                        <span class="status-badge status-waiting" th:text="${order.status}">WAITING_PAYMENT</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong>Total:</strong>
+                                        <span class="h4 text-success" th:text="'R$ ' + ${#numbers.formatDecimal(order.total, 1, 2)}">R$ 49,90</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Email de entrega:</strong>
+                                        <span th:text="${order.deliveryEmail}">cliente@email.com</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Itens do Pedido -->
+                        <h5 class="mb-3">
+                            <i class="bi bi-box-seam text-primary me-2"></i>
+                            Itens do Pedido
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-market">
+                                <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="text-center">Quantidade</th>
+                                    <th class="text-end">Preço Unitário</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Exemplo de item -->
+                                <tr>
+                                    <td>
+                                        <strong>Netflix Premium</strong><br>
+                                        <small class="text-muted">Conta 4K, 4 telas</small>
+                                    </td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-end">R$ 49,90</td>
+                                    <td class="text-end">R$ 49,90</td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-end h5 text-success">R$ 49,90</td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Opções de Pagamento -->
+                        <div class="mt-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-credit-card text-primary me-2"></i>
+                                Escolha a forma de pagamento
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card card-market mb-3">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-upc-scan display-4 text-primary mb-3"></i>
+                                            <h5>PIX</h5>
+                                            <p class="text-muted small">
+                                                Pagamento instantâneo<br>
+                                                Sem taxas
+                                            </p>
+                                            <a th:href="@{/payments/pix/orders/{orderId}(orderId=${order.id})}"
+                                               class="btn btn-market btn-market-primary">
+                                                Pagar com PIX
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card card-market mb-3 opacity-50">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-credit-card display-4 text-muted mb-3"></i>
+                                            <h5 class="text-muted">Cartão de Crédito</h5>
+                                            <p class="text-muted small">
+                                                Em breve<br>
+                                                <!-- Em desenvolvimento -->
+                                            </p>
+                                            <button class="btn btn-market btn-secondary" disabled>
+                                                Em breve
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGAMENTO PIX ========== -->
+    <div th:if="${page == 'pix-payment'}" class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-market">
+                    <div class="card-header bg-dark">
+                        <h3 class="mb-0">
+                            <i class="bi bi-qr-code-scan text-primary me-2"></i>
+                            Pagamento PIX
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Timer de expiração -->
+                        <div class="alert alert-warning alert-market mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-clock-history fs-4 me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Pagamento expira em:</h6>
+                                    <div id="countdown" class="h4 mb-0">30:00</div>
+                                    <small>Após esse tempo, o QR Code será invalidado</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- QR Code -->
+                            <div class="col-lg-6 text-center mb-4">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-qr-code me-2"></i>
+                                    Escaneie o QR Code
+                                </h5>
+                                <div class="qrcode-container mb-3">
+                                    <!-- QR Code Base64 será injetado aqui -->
+                                    <img th:src="'data:image/png;base64,' + ${payment.pixQrCode}"
+                                         alt="QR Code PIX" class="img-fluid" style="max-width: 250px;">
+                                </div>
+                                <p class="text-muted small">
+                                    Abra seu app bancário e escaneie o código
+                                </p>
+                            </div>
+
+                            <!-- Código Copia e Cola -->
+                            <div class="col-lg-6">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-clipboard me-2"></i>
+                                    Copia e Cola
+                                </h5>
+                                <div class="input-group mb-3">
+                                    <input type="text" id="pixCode"
+                                           th:value="${payment.pixQrCodeText}"
+                                           class="form-control form-control-market"
+                                           readonly>
+                                    <button class="btn btn-market btn-market-primary" onclick="copyPixCode()">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="alert alert-market small">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Copie o código e cole no app do seu banco
+                                </div>
+
+                                <!-- Status do Pagamento -->
+                                <div class="mt-4">
+                                    <h6>Status do pagamento:</h6>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div id="paymentStatus"
+                                             class="status-badge status-waiting pulse">
+                                            <i class="bi bi-clock me-1"></i>
+                                            <span th:text="${payment.status}">PENDING</span>
+                                        </div>
+                                    </div>
+                                    <div id="statusMessage" class="text-muted small">
+                                        Aguardando confirmação do pagamento...
+                                    </div>
+                                </div>
+
+                                <!-- Instruções -->
+                                <div class="mt-4">
+                                    <h6 class="mb-2">
+                                        <i class="bi bi-list-check me-2"></i>
+                                        Como pagar:
+                                    </h6>
+                                    <ol class="small">
+                                        <li>Abra o app do seu banco</li>
+                                        <li>Vá na opção "Pagar com PIX"</li>
+                                        <li>Escaneie o QR Code ou cole o código</li>
+                                        <li>Confirme o pagamento</li>
+                                        <li>Aguarde a confirmação automática</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <a href="/user/orders" class="btn btn-market btn-outline-light w-100">
+                                    <i class="bi bi-arrow-left me-2"></i>Voltar aos Pedidos
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button onclick="checkPaymentStatus()" class="btn btn-market btn-market-primary w-100">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Verificar Status
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MEUS PEDIDOS ========== -->
+    <div th:if="${page == 'user-orders'}" class="main-content">
+        <h1 class="mb-4">
+            <i class="bi bi-receipt text-primary me-2"></i>
+            Meus Pedidos
+        </h1>
+
+        <div class="table-responsive">
+            <table class="table table-market">
+                <thead>
+                <tr>
+                    <th>Pedido #</th>
+                    <th>Data</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Entrega</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Pedido 1 -->
+                <tr>
+                    <td><strong>#00123</strong></td>
+                    <td>01/01/2023 14:30</td>
+                    <td class="text-success fw-bold">R$ 49,90</td>
+                    <td>
+                                <span class="status-badge status-paid">
+                                    <i class="bi bi-check-circle me-1"></i>PAID
+                                </span>
+                    </td>
+                    <td>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Entregue
+                                </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Pedido 2 -->
+                <tr>
+                    <td><strong>#00122</strong></td>
+                    <td>31/12/2022 10:15</td>
+                    <td class="text-success fw-bold">R$ 299,90</td>
+                    <td>
+                                <span class="status-badge status-paid">
+                                    <i class="bi bi-check-circle me-1"></i>PAID
+                                </span>
+                    </td>
+                    <td>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Entregue
+                                </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Pedido 3 (Aguardando pagamento) -->
+                <tr>
+                    <td><strong>#00124</strong></td>
+                    <td>02/01/2023 16:45</td>
+                    <td class="text-warning fw-bold">R$ 599,90</td>
+                    <td>
+                                <span class="status-badge status-waiting">
+                                    <i class="bi bi-clock me-1"></i>WAITING_PAYMENT
+                                </span>
+                    </td>
+                    <td>
+                                <span class="badge bg-warning">
+                                    <i class="bi bi-clock me-1"></i>Aguardando
+                                </span>
+                    </td>
+                    <td>
+                        <a href="/payments/pix/orders/124" class="btn btn-sm btn-market btn-market-primary">
+                            <i class="bi bi-qr-code me-1"></i>Pagar
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal de Detalhes do Pedido -->
+        <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">
+                            <i class="bi bi-receipt me-2"></i>
+                            Pedido #00123 - Detalhes
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Itens do Pedido -->
+                        <h6 class="mb-3">Itens Comprados:</h6>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between">
+                                <span>Netflix Premium (1 unidade)</span>
+                                <span>R$ 49,90</span>
+                            </li>
+                        </ul>
+
+                        <!-- Contas Entregues -->
+                        <h6 class="mb-3">Contas Entregues:</h6>
+                        <div class="alert alert-market">
+                            <i class="bi bi-envelope-check me-2"></i>
+                            As credenciais foram enviadas para:
+                            <strong>cliente@email.com</strong>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Credenciais:</label>
+                            <input type="text" class="form-control form-control-market"
+                                   value="netflix@conta.com:SenhaSegura123" readonly>
+                        </div>
+
+                        <!-- Informações de Pagamento -->
+                        <h6 class="mb-3">Informações do Pagamento:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Método:</strong> PIX</p>
+                                <p><strong>Data do pagamento:</strong> 01/01/2023 14:35</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>ID do pagamento:</strong> MP123456789</p>
+                                <p><strong>Status:</strong>
+                                    <span class="badge bg-success">Aprovado</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-market btn-outline-light" data-bs-dismiss="modal">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ADMIN: LISTA DE PRODUTOS ========== -->
+    <div th:if="${page == 'admin-products'}" class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-box-seam text-primary me-2"></i>
+                Gerenciar Produtos
+            </h1>
+            <a href="/admin/products/new" class="btn btn-market btn-market-success">
+                <i class="bi bi-plus-circle me-2"></i>Novo Produto
+            </a>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card card-market">
+                    <div class="card-body text-center">
+                        <h2 class="text-primary">12</h2>
+                        <p class="text-muted mb-0">Produtos Ativos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-market">
+                    <div class="card-body text-center">
+                        <h2 class="text-success">156</h2>
+                        <p class="text-muted mb-0">Itens em Estoque</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-market">
+                    <div class="card-body text-center">
+                        <h2 class="text-warning">42</h2>
+                        <p class="text-muted mb-0">Vendidos Hoje</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-market">
+                    <div class="card-body text-center">
+                        <h2 class="text-danger">3</h2>
+                        <p class="text-muted mb-0">Produtos Esgotados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Produtos -->
+        <div class="table-responsive">
+            <table class="table table-market">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
+                                 class="rounded me-3" width="50" height="50">
+                            <div>
+                                <strong>Netflix Premium</strong><br>
+                                <small class="text-muted">Streaming</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>R$ 49,90</td>
+                    <td>
+                        <span class="badge bg-success">15 disponíveis</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-dark">AUTOMATIC_DELIVERY</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">Ativo</span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#stockModal">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
+                                 class="rounded me-3" width="50" height="50">
+                            <div>
+                                <strong>Spotify Family</strong><br>
+                                <small class="text-muted">Streaming</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>R$ 299,90</td>
+                    <td>
+                        <span class="badge bg-warning">5 disponíveis</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-dark">AUTOMATIC_DELIVERY</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">Ativo</span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-success">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
+                                 class="rounded me-3" width="50" height="50">
+                            <div>
+                                <strong>Windows 11 Pro</strong><br>
+                                <small class="text-muted">Software</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>R$ 399,90</td>
+                    <td>
+                        <span class="badge bg-danger">Esgotado</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-dark">AUTOMATIC_DELIVERY</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">Inativo</span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-success">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ========== ADMIN: FORMULÁRIO DE PRODUTO ========== -->
+    <div th:if="${page == 'admin-product-form'}" class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-market">
+                    <div class="card-header bg-dark">
+                        <h3 class="mb-0">
+                            <i class="bi bi-box-seam text-primary me-2"></i>
+                            <span th:text="${product != null ? 'Editar Produto' : 'Novo Produto'}">
+                                    Novo Produto
+                                </span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="${product != null ? '/admin/products/' + product.id : '/admin/products'}"
+                              method="POST">
+
+                            <div class="mb-3">
+                                <label class="form-label">Título do Produto *</label>
+                                <input type="text" name="title" class="form-control form-control-market"
+                                       th:value="${product != null ? product.title : ''}"
+                                       placeholder="Ex: Netflix Premium 4K" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Descrição *</label>
+                                <textarea name="description" class="form-control form-control-market"
+                                          rows="4" required
+                                          th:text="${product != null ? product.description : ''}"
+                                          placeholder="Descreva o produto detalhadamente..."></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Preço (R$) *</label>
+                                    <input type="number" name="price" step="0.01" min="0.01"
+                                           class="form-control form-control-market"
+                                           th:value="${product != null ? product.price : ''}"
+                                           placeholder="49.90" required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Tipo de Produto *</label>
+                                    <select name="type" class="form-select form-control-market" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="AUTOMATIC_DELIVERY"
+                                                th:selected="${product != null && product.type == 'AUTOMATIC_DELIVERY'}">
+                                            Entrega Automática
+                                        </option>
+                                        <option value="SERVICE"
+                                                th:selected="${product != null && product.type == 'SERVICE'}">
+                                            Serviço
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">URL da Imagem *</label>
+                                <input type="url" name="imageUrl" class="form-control form-control-market"
+                                       th:value="${product != null ? product.imageUrl : ''}"
+                                       placeholder="https://exemplo.com/imagem.jpg" required>
+                                <div class="form-text text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Use uma imagem com proporção 16:9 (ex: 800x450px)
+                                </div>
+
+                                <!-- Preview da imagem -->
+                                <div th:if="${product != null && product.imageUrl}" class="mt-3">
+                                    <label class="form-label">Preview:</label>
+                                    <img th:src="${product.imageUrl}"
+                                         class="img-thumbnail" style="max-height: 150px;">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/admin/products" class="btn btn-market btn-outline-light">
+                                    <i class="bi bi-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-market btn-market-success">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    <span th:text="${product != null ? 'Atualizar' : 'Criar'}">Criar</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ADMIN: ADICIONAR ESTOQUE ========== -->
+    <div th:if="${page == 'admin-stock'}" class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-market">
+                    <div class="card-header bg-dark">
+                        <h3 class="mb-0">
+                            <i class="bi bi-plus-circle text-success me-2"></i>
+                            Adicionar Estoque
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Seleção do Produto -->
+                        <div class="mb-4">
+                            <label class="form-label">Selecione o Produto *</label>
+                            <select id="productSelect" class="form-select form-control-market" onchange="updateStockInfo()">
+                                <option value="">Selecione um produto...</option>
+                                <option value="1">Netflix Premium (Estoque: 15)</option>
+                                <option value="2">Spotify Family (Estoque: 5)</option>
+                                <option value="3">Windows 11 Pro (Estoque: 0)</option>
+                            </select>
+                        </div>
+
+                        <!-- Info do Estoque Atual -->
+                        <div id="stockInfo" class="alert alert-market mb-4" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Estoque Atual:</strong>
+                                    <div class="h4 text-primary" id="currentStock">0</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Vendidos:</strong>
+                                    <div class="h4 text-success" id="soldStock">0</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Total:</strong>
+                                    <div class="h4 text-info" id="totalStock">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulário de Itens -->
+                        <form id="stockForm">
+                            <div class="mb-4">
+                                <label class="form-label">Itens para Adicionar *</label>
+                                <div class="alert alert-market small mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Formato: <code>email:senha</code> - Um item por linha
+                                </div>
+                                <textarea id="stockItems" class="form-control form-control-market"
+                                          rows="8"
+                                          placeholder="usuario1@email.com:senhaSegura123&#10;usuario2@email.com:outraSenha456&#10;..."></textarea>
+                                <div class="form-text text-muted">
+                                    <span id="itemCount">0</span> itens detectados
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" onclick="addMoreLines()" class="btn btn-market btn-outline-primary">
+                                    <i class="bi bi-plus-lg me-2"></i>Adicionar mais linhas
+                                </button>
+                                <button type="submit" class="btn btn-market btn-market-success">
+                                    <i class="bi bi-database-add me-2"></i>Salvar Estoque
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Exemplo de formato -->
+                        <div class="mt-4">
+                            <h6>
+                                <i class="bi bi-lightbulb me-2"></i>
+                                Exemplo de formato correto:
+                            </h6>
+                            <div class="bg-dark p-3 rounded small">
+                                <code class="text-success">
+                                    netflix.user1@email.com:Senha@123<br>
+                                    spotify.family@email.com:Music2023!<br>
+                                    adobe.account@email.com:Creative#2023<br>
+                                    windows.user@email.com:Win11Pass!
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 404 PAGE ========== -->
+    <div th:if="${page == '404'}" class="main-content">
+        <div class="row justify-content-center align-items-center min-vh-50">
+            <div class="col-md-6 text-center">
+                <i class="bi bi-emoji-frown display-1 text-warning mb-4"></i>
+                <h1 class="display-5 fw-bold mb-4">Página Não Encontrada</h1>
+                <p class="lead mb-4">
+                    Oops! A página que você está procurando não existe ou foi movida.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/" class="btn btn-market btn-market-primary btn-lg">
+                        <i class="bi bi-house-door me-2"></i>Voltar para Home
+                    </a>
+                    <a href="javascript:history.back()" class="btn btn-market btn-outline-light btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== LOADING OVERLAY ========== -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+            <h4>Processando...</h4>
+            <p class="text-muted">Aguarde um momento</p>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer-byte mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">
+                    <i class="bi bi-shop me-2"></i>ByteMarket
+                </h5>
+                <p class="text-muted small">
+                    Seu marketplace digital confiável para contas de streaming, softwares e muito mais.
+                </p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Links Rápidos</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="/" class="text-light text-decoration-none">
+                            <i class="bi bi-chevron-right me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/user/orders" class="text-light text-decoration-none">
+                            <i class="bi bi-chevron-right me-1"></i>Meus Pedidos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Contato</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="bi bi-envelope me-2"></i>
+                        <span class="text-muted">suporte@bytemarket.com</span>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-headset me-2"></i>
+                        <span class="text-muted">Suporte 24/7</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr class="border-secondary my-4">
+        <div class="text-center">
+            <p class="text-muted small mb-0">
+                &copy; 2024 ByteMarket. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+    // ========== PIX PAYMENT FUNCTIONS ==========
+
+    // Countdown timer for PIX payment
+    function startCountdown(minutes) {
+        let seconds = minutes * 60;
+        const countdownElement = document.getElementById('countdown');
+
+        const timer = setInterval(() => {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+
+            countdownElement.textContent =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            if (seconds <= 0) {
+                clearInterval(timer);
+                countdownElement.textContent = "EXPIRADO";
+                countdownElement.classList.remove('text-warning');
+                countdownElement.classList.add('text-danger');
+            }
+
+            seconds--;
+        }, 1000);
     }
+
+    // Copy PIX code to clipboard
+    function copyPixCode() {
+        const pixCode = document.getElementById('pixCode');
+        pixCode.select();
+        pixCode.setSelectionRange(0, 99999); // For mobile devices
+
+        navigator.clipboard.writeText(pixCode.value)
+            .then(() => {
+                // Visual feedback
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i>';
+                button.classList.remove('btn-market-primary');
+                button.classList.add('btn-market-success');
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('btn-market-success');
+                    button.classList.add('btn-market-primary');
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+            });
     }
 
-    @Transactional(readOnly = true)
-    public StockStatusDTO getStockStatus(Long productId) {
-    Product product = productRepository.findById(productId)
-    .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + productId));
+    // Check payment status periodically
+    let paymentCheckInterval;
+    function checkPaymentStatus() {
+        const statusElement = document.getElementById('paymentStatus');
+        const messageElement = document.getElementById('statusMessage');
 
-    long available = stockValidator.getAvailableStock(product);
-    long total = stockItemRepository.count();
-    long sold = total - available;
+        // Show loading
+        statusElement.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>VERIFICANDO...';
 
-    return new StockStatusDTO(
-    product.getId(),
-    product.getTitle(),
-    available,
-    sold,
-    total
-    );
+        // Simulate API call
+        setTimeout(() => {
+            // Simulate payment approved
+            const isApproved = Math.random() > 0.7; // 30% chance of being approved
+
+            if (isApproved) {
+                statusElement.innerHTML = '<i class="bi bi-check-circle me-1"></i>APROVADO';
+                statusElement.className = 'status-badge status-paid';
+                messageElement.textContent = 'Pagamento confirmado! Redirecionando...';
+                messageElement.className = 'text-success';
+
+                // Stop checking
+                clearInterval(paymentCheckInterval);
+
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/user/orders';
+                }, 3000);
+            } else {
+                statusElement.innerHTML = '<i class="bi bi-clock me-1"></i>PENDENTE';
+                statusElement.className = 'status-badge status-waiting pulse';
+                messageElement.textContent = 'Aguardando confirmação do pagamento...';
+                messageElement.className = 'text-muted';
+            }
+        }, 2000);
     }
 
-    private ProductResponseDTO mapToResponse(Product product) {
-    long availableStock = stockValidator.getAvailableStock(product);
+    // Auto-check payment status every 10 seconds
+    function startPaymentPolling(paymentId) {
+        paymentCheckInterval = setInterval(checkPaymentStatus, 10000);
+    }
 
-    return new ProductResponseDTO(
-    product.getId(),
-    product.getTitle(),
-    product.getDescription(),
-    product.getPrice(),
-    product.getImageUrl(),
-    product.getType(),
-    availableStock
-    );
+    // ========== STOCK MANAGEMENT FUNCTIONS ==========
+
+    function updateStockInfo() {
+        const select = document.getElementById('productSelect');
+        const stockInfo = document.getElementById('stockInfo');
+
+        if (select.value) {
+            stockInfo.style.display = 'block';
+
+            // Mock data based on product
+            const stockData = {
+                '1': { current: 15, sold: 42, total: 57 },
+                '2': { current: 5, sold: 18, total: 23 },
+                '3': { current: 0, sold: 25, total: 25 }
+            };
+
+            const data = stockData[select.value] || { current: 0, sold: 0, total: 0 };
+
+            document.getElementById('currentStock').textContent = data.current;
+            document.getElementById('soldStock').textContent = data.sold;
+            document.getElementById('totalStock').textContent = data.total;
+        } else {
+            stockInfo.style.display = 'none';
+        }
     }
+
+    function updateItemCount() {
+        const textarea = document.getElementById('stockItems');
+        const lines = textarea.value.split('\n').filter(line => line.trim().includes(':'));
+        document.getElementById('itemCount').textContent = lines.length;
     }
+
+    function addMoreLines() {
+        const textarea = document.getElementById('stockItems');
+        textarea.value += '\n\n';
+        textarea.focus();
+        updateItemCount();
+    }
+
+    // ========== FORM VALIDATION ==========
+
+    function validateStockForm(event) {
+        event.preventDefault();
+
+        const productSelect = document.getElementById('productSelect');
+        const stockItems = document.getElementById('stockItems');
+
+        if (!productSelect.value) {
+            alert('Por favor, selecione um produto.');
+            productSelect.focus();
+            return false;
+        }
+
+        const lines = stockItems.value.split('\n').filter(line => line.trim());
+        if (lines.length === 0) {
+            alert('Por favor, adicione pelo menos um item de estoque.');
+            stockItems.focus();
+            return false;
+        }
+
+        // Validate format (email:password)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        for (let line of lines) {
+            const parts = line.trim().split(':');
+            if (parts.length !== 2 || !emailRegex.test(parts[0]) || parts[1].length < 3) {
+                alert(`Formato inválido na linha: "${line}"\n\nUse o formato: email:senha`);
+                return false;
+            }
+        }
+
+        // Show loading
+        showLoading();
+
+        // Simulate API call
+        setTimeout(() => {
+            hideLoading();
+            alert(`${lines.length} itens adicionados ao estoque com sucesso!`);
+            document.getElementById('stockForm').reset();
+            updateItemCount();
+            document.getElementById('stockInfo').style.display = 'none';
+        }, 2000);
+
+        return false;
+    }
+
+    // ========== UTILITY FUNCTIONS ==========
+
+    function showLoading() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // Add to cart animation
+    function addToCart(productId, productName) {
+        const cartBtn = event.target.closest('.add-to-cart');
+        const originalText = cartBtn.innerHTML;
+
+        // Animation
+        cartBtn.innerHTML = '<i class="bi bi-check"></i> ADICIONADO';
+        cartBtn.classList.remove('btn-market-primary');
+        cartBtn.classList.add('btn-market-success');
+
+        // Show notification
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+        notification.style.zIndex = '9999';
+        notification.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>${productName}</strong> adicionado ao carrinho!
+            `;
+        document.body.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+            cartBtn.innerHTML = originalText;
+            cartBtn.classList.remove('btn-market-success');
+            cartBtn.classList.add('btn-market-primary');
+        }, 3000);
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start PIX countdown if on PIX page
+        if (document.getElementById('countdown')) {
+            startCountdown(30); // 30 minutes
+            startPaymentPolling();
+        }
+
+        // Update stock item count
+        const stockItemsTextarea = document.getElementById('stockItems');
+        if (stockItemsTextarea) {
+            stockItemsTextarea.addEventListener('input', updateItemCount);
+            updateItemCount();
+
+            // Setup form submission
+            document.getElementById('stockForm').addEventListener('submit', validateStockForm);
+        }
+
+        // Add smooth scrolling to all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+
+    // Search functionality
+    function searchProducts() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const productCards = document.querySelectorAll('.card-market');
+
+        productCards.forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            const description = card.querySelector('.card-text').textContent.toLowerCase();
+
+            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                }, 50);
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
+            }
+        });
+    }
+</script>
+</body>
+</html>
