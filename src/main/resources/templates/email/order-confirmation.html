@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido Confirmado</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background-color: #0f172a; color: #ffffff; padding: 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 30px; color: #334155; }
+        .message { font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .highlight-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .product-title { font-weight: bold; color: #6366f1; font-size: 18px; margin-bottom: 10px; }
+        .access-data { background-color: #1e293b; color: #4ade80; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 14px; margin-bottom: 5px; }
+        .footer { background-color: #f1f5f9; padding: 20px; text-align: center; font-size: 12px; color: #64748b; }
+        .support-badge { display: inline-block; background-color: #dcfce7; color: #166534; padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎮 ByteMarket</h1>
+    </div>
+
+    <div class="content">
+        <h2>Pedido #<span th:text="${orderId}">123</span> Confirmado! ✅</h2>
+
+        <p class="message">
+            Olá! Obrigado por comprar na ByteMarket. O pagamento foi aprovado e seus produtos digitais já estão liberados abaixo.
+        </p>
+
+        <div class="highlight-box">
+            <strong>Resumo do Pedido:</strong><br>
+            Data: <span th:text="${#dates.format(orderDate, 'dd/MM/yyyy HH:mm')}">20/01/2026</span><br>
+            Total: <strong>R$ <span th:text="${total}">50,00</span></strong>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+
+        <h3>📦 Seus Produtos e Acessos:</h3>
+
+        <div th:each="item : ${items}" style="margin-bottom: 25px;">
+            <div class="product-title">
+                <span th:text="${item.productTitle}">Netflix 4K</span>
+                <span style="font-size: 14px; color: #64748b;">(x<span th:text="${item.quantity}">1</span>)</span>
+            </div>
+
+            <div th:each="account : ${item.accounts}">
+                <div class="access-data">
+                    🔑 <span th:text="${account}">email@exemplo.com:senha123</span>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(item.accounts)}">
+                <p style="color: #64748b; font-style: italic;">Este é um serviço. Entraremos em contato em breve.</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <span class="support-badge">🛡️ Garantia de 30 Dias</span>
+            <p class="message" style="font-size: 14px; margin-top: 10px;">
+                Caso tenha qualquer problema com o acesso, responda este email ou entre em contato com nosso suporte.
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>ByteMarket - O melhor do mundo digital.<br>
+            Este é um email automático, por favor não responda a menos que precise de suporte.</p>
+    </div>
+</div>
+</body>
+</html>
