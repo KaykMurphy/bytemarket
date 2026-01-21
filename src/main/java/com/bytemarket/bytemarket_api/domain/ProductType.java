@@ -1,5 +1,18 @@
 package com.bytemarket.bytemarket_api.domain;
 
 public enum ProductType {
-    AUTOMATIC_DELIVERY, SERVICE
+
+    ASSINATURAS,
+    KEYS,
+    DISCORD,
+    CONTAS,
+    UTILIDADES,
+    METODOS,
+    STREAMING,
+
+
+    AUTOMATIC_DELIVERY,
+    SERVICE,
+
+
 }

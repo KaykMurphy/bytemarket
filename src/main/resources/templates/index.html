@@ -3,97 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ByteMarket - E-commerce de Produtos Digitais</title>
+    <title>ByteMarket | Marketplace Premium de Produtos Digitais</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <style>
         :root {
-            --primary-color: #6366f1;
-            --secondary-color: #8b5cf6;
-            --success-color: #10b981;
-            --dark-bg: #0f172a;
-            --dark-card: #1e293b;
-            --dark-border: #334155;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-glass: rgba(30, 41, 59, 0.7);
+            --border-primary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-orange: #f97316;
+            --accent-orange-hover: #ea580c;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient-primary: linear-gradient(135deg, #f97316 0%, #8b5cf6 100%);
+            --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+            --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            font-family: 'Inter', system-ui, sans-serif;
+            overflow-x: hidden;
         }
 
-        .navbar {
-            background: rgba(15, 23, 42, 0.95) !important;
+        /* Scrollbar Personalizada */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-orange);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-orange-hover);
+        }
+
+        /* Glassmorphism Effects */
+        .glass-card {
+            background: var(--bg-glass);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--dark-border);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
         }
 
-        .navbar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        /* Navbar Glassmorphism */
+        .navbar-glass {
+            background: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
         }
 
-        .card {
-            background: var(--dark-card);
-            border: 1px solid var(--dark-border);
-            border-radius: 1rem;
-            transition: all 0.3s ease;
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%),
+            url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop') center/cover;
+            padding: 6rem 0;
+            position: relative;
             overflow: hidden;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
-            border-color: var(--primary-color);
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-            border-bottom: 1px solid var(--dark-border);
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 3rem;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            padding: 0.6rem 1.5rem;
-            font-weight: 600;
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            min-width: 150px;
         }
 
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-orange);
+            box-shadow: var(--shadow-glow);
         }
 
-        .btn-success {
-            background: var(--success-color);
-            border: none;
-        }
-
-        .badge {
-            padding: 0.4rem 0.8rem;
-            font-weight: 600;
-        }
-
-        .price {
-            font-size: 1.8rem;
+        .stat-number {
+            font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            line-height: 1;
         }
 
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem 0;
+        }
+
+        .category-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-orange);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .category-card.active {
+            border-color: var(--accent-orange);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .category-image {
+            height: 140px;
+            width: 100%;
+            object-fit: cover;
+            background: linear-gradient(45deg, var(--bg-secondary), var(--accent-purple));
+        }
+
+        .category-name {
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Product Cards */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -101,595 +198,1272 @@
             padding: 2rem 0;
         }
 
-        .hero {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            border-radius: 1rem;
-            padding: 3rem 2rem;
-            margin-bottom: 3rem;
-            border: 1px solid var(--dark-border);
+        @media (min-width: 1400px) {
+            .product-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
         }
 
-        .form-control, .form-select {
-            background: var(--dark-card);
-            border: 1px solid var(--dark-border);
-            color: #e2e8f0;
-            padding: 0.75rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background: var(--dark-card);
-            border-color: var(--primary-color);
-            color: #e2e8f0;
-            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
-        }
-
-        .table {
-            color: #e2e8f0;
-        }
-
-        .table-dark {
-            --bs-table-bg: var(--dark-card);
-            --bs-table-border-color: var(--dark-border);
-        }
-
-        .qr-code-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            display: inline-block;
-        }
-
-        .copy-btn {
+        .product-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
             cursor: pointer;
-        }
-
-        .footer {
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid var(--dark-border);
-            margin-top: 4rem;
-            padding: 2rem 0;
-        }
-
-        .out-of-stock {
-            opacity: 0.6;
+            transition: all 0.4s ease;
+            border: 1px solid var(--border-primary);
             position: relative;
         }
 
-        .out-of-stock::after {
-            content: 'ESGOTADO';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(239, 68, 68, 0.9);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 800;
-            z-index: 10;
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-orange);
+            box-shadow: var(--shadow-glow);
         }
 
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-image {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+            background: var(--bg-secondary);
+        }
+
+        .product-body {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-orange);
+            margin: 0.5rem 0;
+        }
+
+        .product-stock {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .product-stock.out {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .out-of-stock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+        }
+
+        .out-of-stock-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            transform: rotate(-5deg);
+        }
+
+        /* Product Details Page - Trust Layout */
+        .product-detail-section {
+            padding: 4rem 0;
+        }
+
+        .product-image-container {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .product-main-image {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .selected-plan-card {
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 3px solid var(--accent-orange);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .selected-plan-card::before {
+            content: "✓ SELECIONADO";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .selected-plan-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .selected-plan-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .warning-title {
+            color: var(--warning);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Checkout Card Sticky */
+        .checkout-card-sticky {
+            position: sticky;
+            top: 2rem;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-primary);
+        }
+
+        .buy-now-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 12px;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .buy-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .add-to-cart-btn {
+            background: transparent;
+            color: var(--accent-orange);
+            border: 2px solid var(--accent-orange);
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .guarantee-cards {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .guarantee-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .guarantee-card:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(5px);
+        }
+
+        .guarantee-icon {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Related Products */
+        .related-products-carousel {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scrollbar-width: thin;
+        }
+
+        .related-products-carousel::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .related-products-carousel::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
+        }
+
+        .related-products-carousel::-webkit-scrollbar-thumb {
+            background: var(--accent-orange);
+            border-radius: 3px;
+        }
+
+        /* Checkout Page */
+        .checkout-section {
+            padding: 4rem 0;
+        }
+
+        .payment-option-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-primary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-option-card.active {
+            border-color: var(--accent-orange);
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        .payment-option-card:hover {
+            border-color: var(--accent-orange);
+        }
+
+        .pix-badge {
+            background: var(--success);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .order-summary-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-primary);
+        }
+
+        .coupon-input-group {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Admin Styles */
+        .admin-section {
+            padding: 2rem 0;
+        }
+
+        .category-image-preview {
+            width: 100px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            border: 2px solid var(--border-primary);
+        }
+
+        /* Custom Quill Editor */
+        .ql-toolbar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary) !important;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .ql-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary) !important;
+            border-radius: 0 0 8px 8px;
+            min-height: 200px;
+        }
+
+        .ql-editor {
+            color: var(--text-primary);
+            min-height: 200px;
+        }
+
+        /* SPA Screens */
         .screen {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
 
         .screen.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Badge Colors */
+        .badge-category {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .badge-stock {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        /* Loading Spinner */
         .loading-spinner {
             display: inline-block;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-orange);
             border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .payment-status {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-weight: 600;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 4rem 0;
+            }
+
+            .hero-stats {
+                gap: 1rem;
+            }
+
+            .stat-card {
+                min-width: 120px;
+                padding: 1rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .checkout-card-sticky {
+                position: static;
+                margin-top: 2rem;
+            }
         }
 
-        .payment-status.pending {
-            background: rgba(234, 179, 8, 0.2);
-            border: 1px solid rgba(234, 179, 8, 0.5);
-            color: #fbbf24;
+        /* Custom Form Controls */
+        .form-control-custom {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
         }
 
-        .payment-status.approved {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.5);
-            color: #10b981;
+        .form-control-custom:focus {
+            background: var(--bg-secondary);
+            border-color: var(--accent-orange);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        /* Dropdown Custom */
+        .dropdown-menu-custom {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-card);
+            border-radius: 12px;
+        }
+
+        .dropdown-item-custom {
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item-custom:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+        }
+
+        /* Cart Count Badge */
+        .cart-count-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Animated Gradient Text */
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
     </style>
 </head>
 <body>
-
-<!-- ==================== NAVBAR ==================== -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+<!-- Navbar Glassmorphism -->
+<nav class="navbar navbar-expand-lg navbar-glass fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="#" onclick="showScreen('home')">
+        <a class="navbar-brand fw-bold fs-3 gradient-text" href="#" onclick="showScreen('home')">
             <i class="bi bi-controller me-2"></i>ByteMarket
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-list text-white fs-3"></i>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="showScreen('home')">
-                        <i class="bi bi-house me-1"></i>Home
+                    <a class="nav-link fw-medium" href="#" onclick="showScreen('home')">Início</a>
+                </li>
+
+                <li class="nav-item" id="loginNavBtn">
+                    <a class="nav-link fw-medium" href="#" onclick="showScreen('login')">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
                     </a>
                 </li>
 
-                <!-- Se não logado -->
-                <li class="nav-item" id="loginBtn">
-                    <a class="nav-link" href="#" onclick="showScreen('login')">
-                        <i class="bi bi-box-arrow-in-right me-1"></i>Login
-                    </a>
-                </li>
-                <li class="nav-item" id="registerBtn">
-                    <a class="nav-link" href="#" onclick="showScreen('register')">
-                        <i class="bi bi-person-plus me-1"></i>Registrar
-                    </a>
-                </li>
-
-                <!-- Se logado -->
-                <li class="nav-item d-none" id="myOrdersBtn">
-                    <a class="nav-link" href="#" onclick="showScreen('myOrders')">
+                <li class="nav-item d-none" id="myOrdersNavBtn">
+                    <a class="nav-link fw-medium" href="#" onclick="showScreen('myOrders')">
                         <i class="bi bi-bag me-1"></i>Meus Pedidos
                     </a>
                 </li>
 
-                <!-- Menu Admin -->
-                <li class="nav-item dropdown d-none" id="adminMenu">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-gear me-1"></i>Admin
+                <li class="nav-item dropdown d-none" id="adminNavMenu">
+                    <a class="nav-link fw-medium dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-shield-check me-1"></i>Admin
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="#" onclick="showScreen('adminProducts')">
-                            <i class="bi bi-box me-2"></i>Gerenciar Produtos
+                    <ul class="dropdown-menu dropdown-menu-custom">
+                        <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="showScreen('adminCategories')">
+                            <i class="bi bi-grid-3x3 me-2"></i>Categorias
                         </a></li>
-                        <li><a class="dropdown-item" href="#" onclick="showScreen('adminStock')">
-                            <i class="bi bi-plus-circle me-2"></i>Adicionar Estoque
+                        <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="showScreen('adminProducts')">
+                            <i class="bi bi-box me-2"></i>Produtos
+                        </a></li>
+                        <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="showScreen('adminStock')">
+                            <i class="bi bi-plus-circle me-2"></i>Estoque
                         </a></li>
                     </ul>
                 </li>
 
-                <!-- Usuário logado -->
-                <li class="nav-item d-none" id="userInfo">
-                    <span class="nav-link">
-                        <i class="bi bi-person-circle me-1"></i>
-                        <span id="userName">Usuário</span>
-                    </span>
+                <li class="nav-item d-none" id="userNavInfo">
+                        <span class="nav-link fw-medium">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span id="navUserName"></span>
+                        </span>
                 </li>
-                <li class="nav-item d-none" id="logoutBtn">
-                    <a class="nav-link" href="#" onclick="logout()">
+
+                <li class="nav-item d-none" id="logoutNavBtn">
+                    <a class="nav-link fw-medium" href="#" onclick="logout()">
                         <i class="bi bi-box-arrow-right me-1"></i>Sair
                     </a>
+                </li>
+
+                <li class="nav-item">
+                    <button class="btn btn-outline-light rounded-pill px-3" onclick="openSupport()">
+                        <i class="bi bi-headset me-2"></i>Suporte
+                    </button>
+                </li>
+
+                <li class="nav-item position-relative">
+                    <button class="btn btn-gradient rounded-pill px-4" onclick="showScreen('cart')" style="background: var(--gradient-primary); border: none; color: white;">
+                        <i class="bi bi-cart3 me-2"></i>Carrinho
+                        <span class="cart-count-badge" id="cartCount">0</span>
+                    </button>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container py-4">
-
-    <!-- ==================== TELA: HOME (Vitrine de Produtos) ==================== -->
+<!-- Main Content Container -->
+<main class="container-fluid px-0">
+    <!-- HOME SCREEN -->
     <div id="homeScreen" class="screen active">
-        <div class="hero text-center">
-            <h1 class="display-4 fw-bold mb-3">
-                <i class="bi bi-controller me-3"></i>ByteMarket
-            </h1>
-            <p class="lead mb-0">Sua loja de contas digitais e produtos premium</p>
-        </div>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container text-center">
+                <h1 class="display-3 fw-bold mb-4">
+                    <span class="gradient-text">Produtos Digitais</span> Premium<br>
+                    Para Gamers e Streamers
+                </h1>
+                <p class="lead mb-5 text-white-75" style="max-width: 800px; margin: 0 auto;">
+                    Keys, Contas, Assinaturas e muito mais. Compre com segurança e receba instantaneamente.
+                    Mais de 50.000 clientes satisfeitos em toda a América Latina.
+                </p>
 
-        <div class="product-grid" id="productList">
-            <!-- Produtos serão carregados aqui via JavaScript -->
-        </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">4.9/5</div>
+                        <div class="text-white-75 mt-2">AVALIAÇÕES</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">24h</div>
+                        <div class="text-white-75 mt-2">ENTREGA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="text-white-75 mt-2">SEGURO</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">50K+</div>
+                        <div class="text-white-75 mt-2">CLIENTES</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="py-5">
+            <div class="container">
+                <h2 class="fw-bold mb-4">Explore por <span class="gradient-text">Categorias</span></h2>
+                <div class="category-grid" id="categoriesGrid">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section class="py-5 bg-dark">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold">Produtos em <span class="gradient-text">Destaque</span></h2>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Ordenar por
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-custom">
+                            <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="sortProducts('price_asc')">Menor Preço</a></li>
+                            <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="sortProducts('price_desc')">Maior Preço</a></li>
+                            <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="sortProducts('stock')">Em Estoque</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="product-grid" id="productsGrid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- ==================== TELA: DETALHES DO PRODUTO ==================== -->
+    <!-- PRODUCT DETAILS SCREEN -->
     <div id="productDetailsScreen" class="screen">
-        <button class="btn btn-outline-light mb-4" onclick="showScreen('home')">
-            <i class="bi bi-arrow-left me-2"></i>Voltar
-        </button>
-
-        <div class="row">
-            <div class="col-md-5">
-                <img id="detailImage" src="" class="img-fluid rounded" alt="Produto">
-            </div>
-            <div class="col-md-7">
-                <h2 id="detailTitle" class="fw-bold mb-3"></h2>
-                <p class="price mb-4" id="detailPrice"></p>
-
-                <div class="mb-4">
-                    <span class="badge bg-primary" id="detailType"></span>
-                    <span class="badge bg-success ms-2">
-                    <i class="bi bi-check-circle me-1"></i>
-                    <span id="detailStock"></span> disponíveis
-                </span>
-                </div>
-
-                <p id="detailDescription" class="mb-4"></p>
-
-                <div class="mb-3">
-                    <label class="form-label">Quantidade:</label>
-                    <input type="number" class="form-control w-25" id="quantity" value="1" min="1">
-                </div>
-
-                <button class="btn btn-primary btn-lg" onclick="buyNow()" id="buyBtn">
-                    <i class="bi bi-cart-plus me-2"></i>Comprar Agora
+        <section class="product-detail-section">
+            <div class="container">
+                <button class="btn btn-outline-light mb-4" onclick="showScreen('home')">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar para Produtos
                 </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- ==================== TELA: LOGIN ==================== -->
-    <div id="loginScreen" class="screen">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card">
-                    <div class="card-body p-5">
-                        <h3 class="text-center mb-4">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                        </h3>
+                <div class="row g-5">
+                    <!-- Left Column - Product Info -->
+                    <div class="col-lg-8">
+                        <div class="product-image-container">
+                            <img id="productDetailImage" src="" class="product-main-image" alt="Product Image">
 
-                        <div id="loginError" class="alert alert-danger d-none"></div>
+                            <h1 id="productDetailTitle" class="fw-bold mb-3"></h1>
 
-                        <form id="loginForm" onsubmit="handleLogin(event)">
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="loginEmail" required>
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <span class="badge badge-category" id="productDetailCategory"></span>
+                                <span class="badge badge-stock" id="productDetailStock"></span>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="loginPassword" required>
+                            <div class="product-price display-4 fw-bold mb-4" id="productDetailPrice"></div>
+
+                            <!-- Selected Plan Card -->
+                            <div class="selected-plan-card">
+                                <div class="selected-plan-title" id="selectedPlanTitle"></div>
+                                <div class="selected-plan-price" id="selectedPlanPrice"></div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                Entrar
-                            </button>
-                        </form>
+                            <!-- Product Description -->
+                            <div class="mt-4">
+                                <h4 class="fw-bold mb-3">Descrição do Produto</h4>
+                                <div id="productDetailDescription" class="text-white-75"></div>
+                            </div>
 
-                        <p class="text-center mb-0">
-                            Não tem conta?
-                            <a href="#" onclick="showScreen('register')" class="text-decoration-none">Registre-se</a>
-                        </p>
+                            <!-- Warning Box -->
+                            <div class="warning-box">
+                                <div class="warning-title">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    ATENÇÃO IMPORTANTE
+                                </div>
+                                <p class="mb-0 text-white-75">
+                                    • As credenciais são enviadas automaticamente após a confirmação do pagamento.<br>
+                                    • Este produto é de uso pessoal apenas. Não compartilhe suas credenciais.<br>
+                                    • Suporte disponível 24/7 via Discord em caso de problemas.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- ==================== TELA: REGISTRO ==================== -->
-    <div id="registerScreen" class="screen">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card">
-                    <div class="card-body p-5">
-                        <h3 class="text-center mb-4">
-                            <i class="bi bi-person-plus me-2"></i>Criar Conta
-                        </h3>
+                    <!-- Right Column - Checkout Card -->
+                    <div class="col-lg-4">
+                        <div class="checkout-card-sticky">
+                            <h3 class="fw-bold mb-4">Finalizar Compra</h3>
 
-                        <div id="registerSuccess" class="alert alert-success d-none"></div>
-                        <div id="registerError" class="alert alert-danger d-none"></div>
-
-                        <form id="registerForm" onsubmit="handleRegister(event)">
-                            <div class="mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" class="form-control" id="registerName" required>
+                            <div class="mb-4">
+                                <label class="form-label">Quantidade:</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <button class="btn btn-outline-light" onclick="updateQuantity(-1)">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="number" class="form-control-custom text-center" id="productQuantity" value="1" min="1" readonly style="width: 80px;">
+                                    <button class="btn btn-outline-light" onclick="updateQuantity(1)">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="registerEmail" required>
+                            <button class="buy-now-btn" onclick="buyNow()">
+                                <i class="bi bi-lightning-fill me-2"></i>COMPRAR AGORA
+                            </button>
+
+                            <button class="add-to-cart-btn" onclick="addToCart()">
+                                <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
+                            </button>
+
+                            <div class="guarantee-cards">
+                                <div class="guarantee-card">
+                                    <i class="bi bi-lightning-charge guarantee-icon"></i>
+                                    <div>
+                                        <div class="fw-bold">Entrega Imediata</div>
+                                        <small class="text-white-75">Receba em até 5 minutos</small>
+                                    </div>
+                                </div>
+                                <div class="guarantee-card">
+                                    <i class="bi bi-shield-check guarantee-icon"></i>
+                                    <div>
+                                        <div class="fw-bold">Segurança Total</div>
+                                        <small class="text-white-75">Garantia de 30 dias</small>
+                                    </div>
+                                </div>
+                                <div class="guarantee-card">
+                                    <i class="bi bi-qr-code guarantee-icon"></i>
+                                    <div>
+                                        <div class="fw-bold">Pagamento via PIX</div>
+                                        <small class="text-white-75">Aprovação instantânea</small>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="registerPassword" required minlength="6">
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                Registrar
-                            </button>
-                        </form>
-
-                        <p class="text-center mb-0">
-                            Já tem conta?
-                            <a href="#" onclick="showScreen('login')" class="text-decoration-none">Faça login</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== TELA: CONFIRMAÇÃO DO PEDIDO ==================== -->
-    <div id="orderConfirmationScreen" class="screen">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <h3 class="mb-4">
-                            <i class="bi bi-receipt me-2"></i>Confirmar Pedido
-                        </h3>
-
-                        <div class="mb-4">
-                            <h5>Produto:</h5>
-                            <p id="confirmProductTitle" class="mb-1"></p>
-                            <p id="confirmQuantity" class="text-muted"></p>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label">Email para Entrega:</label>
-                            <input type="email" class="form-control" id="deliveryEmail" required>
-                            <small class="text-muted">As contas serão enviadas para este email</small>
-                        </div>
-
-                        <div class="mb-4">
-                            <h4 class="price" id="confirmTotal"></h4>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-light" onclick="showScreen('productDetails')">
-                                Voltar
-                            </button>
-                            <button class="btn btn-success flex-grow-1" onclick="createOrder()">
-                                <i class="bi bi-check-circle me-2"></i>Confirmar e Pagar
-                            </button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Related Products -->
+                <div class="mt-5">
+                    <h4 class="fw-bold mb-4">Produtos Relacionados</h4>
+                    <div class="related-products-carousel" id="relatedProducts">
+                        <!-- Related products will be loaded here -->
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 
-    <!-- ==================== TELA: PAGAMENTO PIX ==================== -->
+    <!-- CHECKOUT SCREEN -->
+    <div id="checkoutScreen" class="screen">
+        <section class="checkout-section">
+            <div class="container">
+                <button class="btn btn-outline-light mb-4" onclick="showScreen('cart')">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar ao Carrinho
+                </button>
+
+                <div class="row g-5">
+                    <!-- Left Column - Customer Info -->
+                    <div class="col-lg-7">
+                        <div class="glass-card p-4">
+                            <h3 class="fw-bold mb-4">Informações do Pedido</h3>
+
+                            <form id="checkoutForm">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Nome Completo</label>
+                                    <input type="text" class="form-control-custom" id="customerName" required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <input type="email" class="form-control-custom" id="customerEmail" required>
+                                    <small class="text-white-75">As credenciais serão enviadas para este email</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h5 class="fw-bold mb-3">Método de Pagamento</h5>
+
+                                    <div class="payment-option-card active mb-3" onclick="selectPayment('pix')">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <div class="fw-bold mb-1">
+                                                    <i class="bi bi-qr-code me-2"></i>PIX
+                                                </div>
+                                                <small class="text-white-75">Pagamento instantâneo</small>
+                                            </div>
+                                            <span class="pix-badge">
+                                                    <i class="bi bi-check-circle me-1"></i>Aprovação Imediata
+                                                </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="payment-option-card mb-3" onclick="selectPayment('credit')">
+                                        <div>
+                                            <div class="fw-bold mb-1">
+                                                <i class="bi bi-credit-card me-2"></i>Cartão de Crédito
+                                            </div>
+                                            <small class="text-white-75">Até 12x sem juros</small>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" id="paymentMethod" value="pix">
+                                </div>
+
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                    <label class="form-check-label text-white-75">
+                                        Concordo com os <a href="#" class="text-warning">Termos de Serviço</a> e <a href="#" class="text-warning">Política de Privacidade</a>
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Order Summary -->
+                    <div class="col-lg-5">
+                        <div class="order-summary-card">
+                            <h3 class="fw-bold mb-4">Resumo do Pedido</h3>
+
+                            <div id="orderSummaryItems">
+                                <!-- Order items will be loaded here -->
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="form-label fw-bold">Cupom de Desconto</label>
+                                <div class="coupon-input-group">
+                                    <input type="text" class="form-control-custom border-0 bg-transparent" placeholder="Digite seu cupom" id="couponCode">
+                                    <button class="btn btn-outline-light" onclick="applyCoupon()">Aplicar</button>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-white-75">Subtotal</span>
+                                    <span id="orderSubtotal">R$ 0,00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-white-75">Desconto</span>
+                                    <span id="orderDiscount" class="text-success">R$ 0,00</span>
+                                </div>
+                                <hr class="my-3">
+                                <div class="d-flex justify-content-between mb-4">
+                                    <span class="fw-bold">Total</span>
+                                    <span id="orderTotal" class="fw-bold fs-4 text-warning">R$ 0,00</span>
+                                </div>
+
+                                <button class="buy-now-btn w-100" onclick="proceedToPayment()">
+                                    <i class="bi bi-lock-fill me-2"></i>FINALIZAR PAGAMENTO
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PIX PAYMENT SCREEN -->
     <div id="pixPaymentScreen" class="screen">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body p-4 text-center">
-                        <h3 class="mb-4">
-                            <i class="bi bi-qr-code me-2"></i>Pagamento via PIX
-                        </h3>
-
-                        <div id="paymentStatusDiv" class="payment-status pending">
-                            <i class="bi bi-clock me-2"></i>
-                            Aguardando pagamento...
-                        </div>
-
-                        <div class="qr-code-container mb-4">
-                            <img id="pixQrCode" src="" alt="QR Code PIX" style="max-width: 300px; min-height: 300px; background: #f0f0f0;"
-                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect width=%22300%22 height=%22300%22 fill=%22%23ddd%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EQR Code Indisponível%3C/text%3E%3C/svg%3E'">
-                        </div>
-
-                        <p class="mb-3">Ou copie o código PIX:</p>
-
-                        <div class="input-group mb-4">
-                            <input type="text" class="form-control" id="pixCode" readonly>
-                            <button class="btn btn-primary copy-btn" onclick="copyPixCode()">
-                                <i class="bi bi-clipboard"></i> Copiar
-                            </button>
-                        </div>
-
-                        <p class="text-muted">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Após o pagamento, seu pedido será confirmado automaticamente
-                        </p>
-
-                        <p class="text-muted small" id="expiresAt"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== TELA: MEUS PEDIDOS ==================== -->
-    <div id="myOrdersScreen" class="screen">
-        <h3 class="mb-4">
-            <i class="bi bi-bag me-2"></i>Meus Pedidos
-        </h3>
-
-        <div id="ordersList">
-            <!-- Pedidos serão carregados aqui -->
-        </div>
-    </div>
-
-    <!-- ==================== TELA: ADMIN - GERENCIAR PRODUTOS ==================== -->
-    <div id="adminProductsScreen" class="screen">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>
-                <i class="bi bi-box me-2"></i>Gerenciar Produtos
-            </h3>
-            <button class="btn btn-primary" onclick="showProductForm()">
-                <i class="bi bi-plus-circle me-2"></i>Novo Produto
-            </button>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-dark table-hover">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Preço</th>
-                    <th>Tipo</th>
-                    <th>Estoque</th>
-                    <th>Ações</th>
-                </tr>
-                </thead>
-                <tbody id="adminProductsList">
-                <!-- Produtos serão carregados aqui -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ==================== TELA: ADMIN - FORMULÁRIO DE PRODUTO ==================== -->
-    <div id="productFormScreen" class="screen">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <h3 class="mb-4" id="formTitle">
-                            <i class="bi bi-box me-2"></i>Novo Produto
-                        </h3>
-
-                        <form id="productForm" onsubmit="saveProduct(event)">
-                            <input type="hidden" id="productId">
-
-                            <div class="mb-3">
-                                <label class="form-label">Título</label>
-                                <input type="text" class="form-control" id="productTitle" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Descrição</label>
-                                <textarea class="form-control" id="productDescription" rows="4" required></textarea>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Preço</label>
-                                    <input type="number" class="form-control" id="productPrice" step="0.01" required>
+        <section class="checkout-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="order-summary-card">
+                            <div class="text-center mb-4">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="loading-spinner"></div>
                                 </div>
+                                <h3 class="fw-bold">Aguardando Pagamento</h3>
+                                <p class="text-white-75">Escaneie o QR Code ou copie o código PIX</p>
+                            </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Tipo</label>
-                                    <select class="form-select" id="productType" required>
-                                        <option value="AUTOMATIC_DELIVERY">Entrega Automática</option>
-                                        <option value="SERVICE">Serviço</option>
-                                    </select>
+                            <div class="text-center mb-4">
+                                <div class="bg-white p-4 rounded d-inline-block">
+                                    <img id="pixQrCodeImg" src="" alt="QR Code PIX" style="max-width: 300px;">
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">URL da Imagem</label>
-                                <input type="url" class="form-control" id="productImage" required>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Código PIX (Copia e Cola)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control-custom" id="pixCodeInput" readonly>
+                                    <button class="btn btn-outline-light" onclick="copyPixCode()">
+                                        <i class="bi bi-clipboard me-2"></i>Copiar
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-light" onclick="showScreen('adminProducts')">
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-primary flex-grow-1">
-                                    Salvar Produto
+                            <div class="text-center">
+                                <p class="text-white-75" id="pixExpiresAt"></p>
+                                <button class="btn btn-outline-light" onclick="checkPaymentStatus()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Verificar Status
                                 </button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 
-    <!-- ==================== TELA: ADMIN - ADICIONAR ESTOQUE ==================== -->
-    <div id="adminStockScreen" class="screen">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <h3 class="mb-4">
-                            <i class="bi bi-plus-circle me-2"></i>Adicionar Estoque
-                        </h3>
+    <!-- CART SCREEN -->
+    <div id="cartScreen" class="screen">
+        <section class="py-5">
+            <div class="container">
+                <button class="btn btn-outline-light mb-4" onclick="showScreen('home')">
+                    <i class="bi bi-arrow-left me-2"></i>Continuar Comprando
+                </button>
 
-                        <form id="stockForm" onsubmit="addStock(event)">
+                <h2 class="fw-bold mb-4">Meu Carrinho</h2>
+
+                <div id="cartItemsContainer">
+                    <!-- Cart items will be loaded here -->
+                </div>
+
+                <div class="text-end mt-5">
+                    <h4>Total: <span id="cartTotal" class="fw-bold fs-3 text-warning">R$ 0,00</span></h4>
+                    <button class="btn btn-gradient btn-lg mt-3 px-5 py-3" onclick="showScreen('checkout')" style="background: var(--gradient-primary); border: none; color: white;">
+                        <i class="bi bi-lock-fill me-2"></i>Finalizar Pedido
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="screen">
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="order-summary-card">
+                            <div class="text-center mb-4">
+                                <h2 class="fw-bold gradient-text">
+                                    <i class="bi bi-controller me-2"></i>ByteMarket
+                                </h2>
+                                <p class="text-white-75">Acesse sua conta para comprar</p>
+                            </div>
+
+                            <div id="loginError" class="alert alert-danger d-none"></div>
+
+                            <form onsubmit="handleLogin(event)">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <input type="email" class="form-control-custom" id="loginEmail" required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Senha</label>
+                                    <input type="password" class="form-control-custom" id="loginPassword" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-gradient w-100 py-3" style="background: var(--gradient-primary); border: none; color: white;">
+                                    Entrar na Conta
+                                </button>
+                            </form>
+
+                            <div class="text-center mt-4">
+                                <p class="text-white-75 mb-0">
+                                    Não tem conta?
+                                    <a href="#" onclick="showScreen('register')" class="text-warning fw-bold">Cadastre-se</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ADMIN CATEGORIES SCREEN -->
+    <div id="adminCategoriesScreen" class="screen">
+        <section class="admin-section">
+            <div class="container">
+                <button class="btn btn-outline-light mb-4" onclick="showScreen('home')">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </button>
+
+                <h2 class="fw-bold mb-4">
+                    <i class="bi bi-grid-3x3 me-2"></i>Gerenciar Categorias
+                </h2>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="order-summary-card">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Categoria</th>
+                                    <th>URL da Imagem</th>
+                                    <th>Ação</th>
+                                </tr>
+                                </thead>
+                                <tbody id="adminCategoriesTable">
+                                <!-- Categories will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="order-summary-card">
+                            <h5 class="fw-bold mb-4">Editar Imagem da Categoria</h5>
+
                             <div class="mb-3">
-                                <label class="form-label">Produto</label>
-                                <select class="form-select" id="stockProductId" required>
-                                    <!-- Produtos serão carregados aqui -->
+                                <label class="form-label">Categoria</label>
+                                <select class="form-control-custom" id="editCategorySelect">
+                                    <option value="ASSINATURAS">Assinaturas Premium</option>
+                                    <option value="KEYS">Keys Steam</option>
+                                    <option value="DISCORD">Discord</option>
+                                    <option value="CONTAS">Contas/Jogos</option>
+                                    <option value="UTILIDADES">Utilidades</option>
+                                    <option value="METODOS">Métodos</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Itens (um por linha, formato: email:senha ou login:senha)</label>
-                                <textarea class="form-control" id="stockItems" rows="10" required
-                                          placeholder="exemplo@email.com:senha123&#10;usuario123:minhasenha&#10;chave123:abc456"></textarea>
-                                <small class="text-muted">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    Cada linha deve ter o formato <code>login:senha</code> ou <code>email:senha</code>
-                                </small>
+                                <label class="form-label">URL da Imagem</label>
+                                <input type="url" class="form-control-custom" id="editCategoryImage"
+                                       placeholder="https://exemplo.com/imagem.jpg">
+                                <small class="text-white-75">Cole a URL da imagem de capa para esta categoria</small>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="bi bi-plus-circle me-2"></i>Adicionar ao Estoque
+                            <div class="mb-3">
+                                <label class="form-label">Preview</label>
+                                <div class="text-center">
+                                    <img id="categoryImagePreview" class="category-image-preview" src="" alt="Preview">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-gradient w-100" onclick="saveCategoryImage()"
+                                    style="background: var(--gradient-primary); border: none; color: white;">
+                                <i class="bi bi-save me-2"></i>Salvar Visual
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 
-</div>
+    <!-- ADMIN PRODUCTS SCREEN -->
+    <div id="adminProductsScreen" class="screen">
+        <section class="admin-section">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold">
+                        <i class="bi bi-box me-2"></i>Gerenciar Produtos
+                    </h2>
+                    <button class="btn btn-gradient" onclick="showProductForm()"
+                            style="background: var(--gradient-primary); border: none; color: white;">
+                        <i class="bi bi-plus-circle me-2"></i>Novo Produto
+                    </button>
+                </div>
 
-<!-- ==================== FOOTER ==================== -->
-<footer class="footer mt-5">
-    <div class="container text-center">
-        <p class="mb-0">
-            <i class="bi bi-controller me-2"></i>
-            ByteMarket &copy; 2026 - E-commerce de Produtos Digitais
-        </p>
+                <div class="order-summary-card">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Categoria</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="adminProductsTable">
+                        <!-- Products will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </div>
-</footer>
 
-<!-- Bootstrap JS -->
+    <!-- ADMIN PRODUCT FORM SCREEN -->
+    <div id="adminProductFormScreen" class="screen">
+        <section class="admin-section">
+            <div class="container">
+                <button class="btn btn-outline-light mb-4" onclick="showScreen('adminProducts')">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </button>
+
+                <h2 class="fw-bold mb-4" id="productFormTitle">
+                    <i class="bi bi-plus-circle me-2"></i>Novo Produto
+                </h2>
+
+                <div class="order-summary-card">
+                    <form onsubmit="saveProduct(event)">
+                        <input type="hidden" id="editProductId">
+
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Título do Produto</label>
+                                <input type="text" class="form-control-custom" id="productTitle" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Categoria</label>
+                                <select class="form-control-custom" id="productCategory" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="ASSINATURAS">Assinaturas Premium</option>
+                                    <option value="KEYS">Keys Steam</option>
+                                    <option value="DISCORD">Discord</option>
+                                    <option value="CONTAS">Contas/Jogos</option>
+                                    <option value="UTILIDADES">Utilidades</option>
+                                    <option value="METODOS">Métodos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Preço (R$)</label>
+                                <input type="number" class="form-control-custom" id="productPrice" step="0.01" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">URL da Imagem</label>
+                                <input type="url" class="form-control-custom" id="productImage" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Descrição (Rich Text)</label>
+                            <div id="descriptionEditor"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-gradient w-100 py-3"
+                                style="background: var(--gradient-primary); border: none; color: white;">
+                            <i class="bi bi-save me-2"></i>Salvar Produto
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ADMIN STOCK SCREEN -->
+    <div id="adminStockScreen" class="screen">
+        <section class="admin-section">
+            <div class="container">
+                <button class="btn btn-outline-light mb-4" onclick="showScreen('adminProducts')">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </button>
+
+                <h2 class="fw-bold mb-4">
+                    <i class="bi bi-plus-circle me-2"></i>Adicionar Estoque
+                </h2>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="order-summary-card">
+                            <form onsubmit="addStock(event)">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Produto</label>
+                                    <select class="form-control-custom" id="stockProductId" required>
+                                        <!-- Products will be loaded here -->
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Itens de Estoque (um por linha)</label>
+                                    <textarea class="form-control-custom" id="stockItems" rows="10" required
+                                              placeholder="email@exemplo.com:senha123&#10;usuario:senha456&#10;chave-steam:ABC123-XYZ456"></textarea>
+                                    <small class="text-white-75">
+                                        Formato: login:senha ou email:senha<br>
+                                        Cada linha será um item separado no estoque
+                                    </small>
+                                </div>
+
+                                <button type="submit" class="btn btn-gradient w-100 py-3"
+                                        style="background: var(--gradient-primary); border: none; color: white;">
+                                    <i class="bi bi-plus-circle me-2"></i>Adicionar ao Estoque
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="order-summary-card">
+                            <h5 class="fw-bold mb-4">Informações do Estoque</h5>
+                            <div id="stockInfo">
+                                <p class="text-white-75">Selecione um produto para ver informações do estoque</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- JavaScript do Sistema -->
 <script>
-    // ==================== VARIÁVEIS GLOBAIS ====================
+    // Global Variables
     let currentUser = null;
-    let currentProduct = null;
     let authToken = localStorage.getItem('authToken');
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    let allProducts = [];
+    let currentProduct = null;
+    let quillEditor = null;
     let paymentPolling = null;
+    let selectedPayment = 'pix';
+    let categoryImages = JSON.parse(localStorage.getItem('categoryImages') || '{}');
 
-    // ==================== INICIALIZAÇÃO ====================
+    // Category Default Images
+    const defaultCategoryImages = {
+        'ASSINATURAS': 'https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=1974&auto=format&fit=crop',
+        'KEYS': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop',
+        'DISCORD': 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?q=80&w=1974&auto=format&fit=crop',
+        'CONTAS': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop',
+        'UTILIDADES': 'https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=2070&auto=format&fit=crop',
+        'METODOS': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=2068&auto=format&fit=crop'
+    };
+
+    // Initialize Application
     document.addEventListener('DOMContentLoaded', () => {
         checkAuth();
         loadProducts();
+        updateCartUI();
+        loadCategories();
+
+        // Preview category image on input change
+        document.getElementById('editCategoryImage').addEventListener('input', function() {
+            document.getElementById('categoryImagePreview').src = this.value;
+        });
+
+        // Preview product image on input change
+        document.getElementById('productImage').addEventListener('input', function() {
+            // Could add product image preview here
+        });
     });
 
-    // ==================== AUTENTICAÇÃO ====================
+    // Authentication Functions
     function checkAuth() {
         if (authToken) {
-            // Decodificar JWT para pegar dados do usuário
-            const payload = JSON.parse(atob(authToken.split('.')[1]));
-            currentUser = {
-                email: payload.sub,
-                role: payload.role
-            };
+            try {
+                const payload = JSON.parse(atob(authToken.split('.')[1]));
+                currentUser = {
+                    email: payload.sub,
+                    role: payload.role
+                };
 
-            // Atualizar UI
-            document.getElementById('loginBtn').classList.add('d-none');
-            document.getElementById('registerBtn').classList.add('d-none');
-            document.getElementById('myOrdersBtn').classList.remove('d-none');
-            document.getElementById('userInfo').classList.remove('d-none');
-            document.getElementById('logoutBtn').classList.remove('d-none');
-            document.getElementById('userName').textContent = currentUser.email;
+                // Update UI
+                document.getElementById('loginNavBtn').classList.add('d-none');
+                document.getElementById('myOrdersNavBtn').classList.remove('d-none');
+                document.getElementById('userNavInfo').classList.remove('d-none');
+                document.getElementById('logoutNavBtn').classList.remove('d-none');
+                document.getElementById('navUserName').textContent = currentUser.email.split('@')[0];
 
-            // Mostrar menu admin se for admin
-            if (currentUser.role === 'ADMIN') {
-                document.getElementById('adminMenu').classList.remove('d-none');
+                if (currentUser.role === 'ADMIN') {
+                    document.getElementById('adminNavMenu').classList.remove('d-none');
+                }
+            } catch (e) {
+                logout();
             }
         }
     }
 
     async function handleLogin(e) {
         e.preventDefault();
-
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
 
@@ -704,161 +1478,437 @@
                 const data = await response.json();
                 authToken = data.token;
                 localStorage.setItem('authToken', authToken);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login realizado!',
+                    text: 'Bem-vindo de volta!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
                 checkAuth();
                 showScreen('home');
-                document.getElementById('loginForm').reset();
             } else {
-                showError('loginError', 'Email ou senha inválidos');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro no login',
+                    text: 'Email ou senha incorretos',
+                });
             }
         } catch (error) {
-            showError('loginError', 'Erro ao fazer login');
-        }
-    }
-
-    async function handleRegister(e) {
-        e.preventDefault();
-
-        const name = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-
-        try {
-            const response = await fetch('/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível conectar ao servidor',
             });
-
-            if (response.ok) {
-                showSuccess('registerSuccess', 'Conta criada! Faça login.');
-                setTimeout(() => showScreen('login'), 2000);
-            } else {
-                const error = await response.json();
-                showError('registerError', error.message || 'Erro ao registrar');
-            }
-        } catch (error) {
-            showError('registerError', 'Erro ao registrar');
         }
     }
 
     function logout() {
-        authToken = null;
-        currentUser = null;
-        localStorage.removeItem('authToken');
-        location.reload();
+        Swal.fire({
+            title: 'Sair da conta?',
+            text: 'Você será desconectado do sistema',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, sair',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                authToken = null;
+                currentUser = null;
+                localStorage.removeItem('authToken');
+                location.reload();
+            }
+        });
     }
 
-    // ==================== PRODUTOS ====================
+    // Product Functions
     async function loadProducts() {
         try {
             const response = await fetch('/products');
             const data = await response.json();
+            allProducts = data.content;
 
-            const container = document.getElementById('productList');
-            container.innerHTML = '';
-
-            data.content.forEach(product => {
-                const isOutOfStock = product.availableStock === 0;
-
-                container.innerHTML += `
-                <div class="card ${isOutOfStock ? 'out-of-stock' : ''}">
-                    <img src="${product.imageUrl}" class="card-img-top" alt="${product.title}">
-                    <div class="card-body">
-                        <h5 class="card-title">${product.title}</h5>
-                        <p class="price mb-3">R$ ${product.price.toFixed(2)}</p>
-                        <div class="mb-3">
-                            <span class="badge bg-primary">${product.type === 'AUTOMATIC_DELIVERY' ? 'Entrega Automática' : 'Serviço'}</span>
-                            <span class="badge ${isOutOfStock ? 'bg-danger' : 'bg-success'}">
-                                ${isOutOfStock ? 'Esgotado' : product.availableStock + ' disponíveis'}
-                            </span>
-                        </div>
-                        <button class="btn btn-primary w-100" onclick="viewProduct(${product.id})" ${isOutOfStock ? 'disabled' : ''}>
-                            <i class="bi bi-eye me-2"></i>Ver Detalhes
-                        </button>
-                    </div>
-                </div>
-            `;
-            });
+            renderProducts(allProducts);
+            loadCategories();
         } catch (error) {
             console.error('Erro ao carregar produtos:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível carregar os produtos',
+            });
         }
     }
 
-    async function viewProduct(id) {
+    function renderProducts(products) {
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+
+        products.forEach(product => {
+            const isOutOfStock = product.availableStock === 0;
+
+            grid.innerHTML += `
+                    <div class="product-card" onclick="viewProductDetails(${product.id})">
+                        ${isOutOfStock ? `
+                            <div class="out-of-stock-overlay">
+                                <div class="out-of-stock-badge">ESGOTADO</div>
+                            </div>
+                        ` : ''}
+
+                        <img src="${product.imageUrl}" class="product-image" alt="${product.title}">
+                        <div class="product-body">
+                            <div class="product-title">${product.title}</div>
+                            <div class="product-price">R$ ${product.price.toFixed(2)}</div>
+                            <span class="product-stock${isOutOfStock ? ' out' : ''}">
+                                ${isOutOfStock ? 'Esgotado' : product.availableStock + ' em estoque'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+        });
+    }
+
+    function loadCategories() {
+        const container = document.getElementById('categoriesGrid');
+        container.innerHTML = '';
+
+        const categories = [
+            { id: 'all', name: 'Todos', icon: '🎮' },
+            { id: 'ASSINATURAS', name: 'Assinaturas', icon: '📺' },
+            { id: 'KEYS', name: 'Keys Steam', icon: '🎮' },
+            { id: 'DISCORD', name: 'Discord', icon: '💬' },
+            { id: 'CONTAS', name: 'Contas/Jogos', icon: '👤' },
+            { id: 'UTILIDADES', name: 'Utilidades', icon: '🔧' },
+            { id: 'METODOS', name: 'Métodos', icon: '🎯' }
+        ];
+
+        categories.forEach(category => {
+            const imageUrl = categoryImages[category.id] || defaultCategoryImages[category.id] || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop';
+
+            container.innerHTML += `
+                    <div class="category-card" onclick="filterByCategory('${category.id}')">
+                        <img src="${imageUrl}" class="category-image" alt="${category.name}">
+                        <div class="category-name">
+                            ${category.icon} ${category.name}
+                        </div>
+                    </div>
+                `;
+        });
+    }
+
+    function filterByCategory(category) {
+        // Remove active class from all cards
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.classList.remove('active');
+        });
+
+        // Add active class to clicked card
+        event.currentTarget.classList.add('active');
+
+        if (category === 'all') {
+            renderProducts(allProducts);
+        } else {
+            const filtered = allProducts.filter(p => p.type === category);
+            renderProducts(filtered);
+        }
+    }
+
+    function sortProducts(criteria) {
+        let sorted = [...allProducts];
+
+        switch(criteria) {
+            case 'price_asc':
+                sorted.sort((a, b) => a.price - b.price);
+                break;
+            case 'price_desc':
+                sorted.sort((a, b) => b.price - a.price);
+                break;
+            case 'stock':
+                sorted.sort((a, b) => b.availableStock - a.availableStock);
+                break;
+        }
+
+        renderProducts(sorted);
+    }
+
+    // Product Details Functions
+    async function viewProductDetails(id) {
         try {
             const response = await fetch(`/products/${id}`);
             currentProduct = await response.json();
 
-            document.getElementById('detailImage').src = currentProduct.imageUrl;
-            document.getElementById('detailTitle').textContent = currentProduct.title;
-            document.getElementById('detailPrice').textContent = `R$ ${currentProduct.price.toFixed(2)}`;
-            document.getElementById('detailType').textContent = currentProduct.type === 'AUTOMATIC_DELIVERY' ? 'Entrega Automática' : 'Serviço';
-            document.getElementById('detailStock').textContent = currentProduct.availableStock;
-            document.getElementById('detailDescription').textContent = currentProduct.description;
+            // Update UI
+            document.getElementById('productDetailImage').src = currentProduct.imageUrl;
+            document.getElementById('productDetailTitle').textContent = currentProduct.title;
+            document.getElementById('productDetailCategory').textContent = currentProduct.type;
+            document.getElementById('productDetailStock').textContent = `${currentProduct.availableStock} disponíveis`;
+            document.getElementById('productDetailPrice').textContent = `R$ ${currentProduct.price.toFixed(2)}`;
+            document.getElementById('selectedPlanTitle').textContent = currentProduct.title;
+            document.getElementById('selectedPlanPrice').textContent = `R$ ${currentProduct.price.toFixed(2)}`;
+            document.getElementById('productDetailDescription').innerHTML = currentProduct.description;
 
-            if (currentProduct.availableStock === 0) {
-                document.getElementById('buyBtn').disabled = true;
-            }
+            // Load related products
+            loadRelatedProducts(currentProduct.type);
 
             showScreen('productDetails');
         } catch (error) {
             console.error('Erro ao carregar produto:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível carregar os detalhes do produto',
+            });
         }
+    }
+
+    function loadRelatedProducts(category) {
+        const related = allProducts
+            .filter(p => p.type === category && p.id !== currentProduct.id)
+            .slice(0, 5);
+
+        const container = document.getElementById('relatedProducts');
+        container.innerHTML = '';
+
+        related.forEach(product => {
+            container.innerHTML += `
+                    <div class="product-card" style="min-width: 200px;" onclick="viewProductDetails(${product.id})">
+                        <img src="${product.imageUrl}" class="product-image" alt="${product.title}" style="height: 120px;">
+                        <div class="product-body">
+                            <div class="product-title" style="font-size: 0.9rem;">${product.title}</div>
+                            <div class="product-price" style="font-size: 1.2rem;">R$ ${product.price.toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+        });
+    }
+
+    function updateQuantity(change) {
+        const input = document.getElementById('productQuantity');
+        const newValue = parseInt(input.value) + change;
+
+        if (newValue >= 1 && newValue <= currentProduct.availableStock) {
+            input.value = newValue;
+        }
+    }
+
+    // Cart Functions
+    function addToCart() {
+        if (!currentProduct) return;
+
+        const quantity = parseInt(document.getElementById('productQuantity').value);
+        const existingIndex = cart.findIndex(item => item.id === currentProduct.id);
+
+        if (existingIndex >= 0) {
+            cart[existingIndex].quantity += quantity;
+        } else {
+            cart.push({
+                id: currentProduct.id,
+                title: currentProduct.title,
+                price: currentProduct.price,
+                image: currentProduct.imageUrl,
+                quantity: quantity,
+                maxStock: currentProduct.availableStock
+            });
+        }
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartUI();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Adicionado ao carrinho!',
+            text: 'Produto adicionado com sucesso',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 
     function buyNow() {
-        if (!authToken) {
-            alert('Faça login para comprar');
-            showScreen('login');
-            return;
-        }
-
-        const quantity = parseInt(document.getElementById('quantity').value);
-
-        if (quantity > currentProduct.availableStock) {
-            alert(`Apenas ${currentProduct.availableStock} disponíveis`);
-            return;
-        }
-
-        document.getElementById('confirmProductTitle').textContent = currentProduct.title;
-        document.getElementById('confirmQuantity').textContent = `Quantidade: ${quantity}`;
-        document.getElementById('confirmTotal').textContent = `R$ ${(currentProduct.price * quantity).toFixed(2)}`;
-        document.getElementById('deliveryEmail').value = currentUser.email;
-
-        showScreen('orderConfirmation');
+        addToCart();
+        showScreen('checkout');
     }
 
-    async function createOrder() {
-        const quantity = parseInt(document.getElementById('quantity').value);
-        const deliveryEmail = document.getElementById('deliveryEmail').value;
+    function updateCartUI() {
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cartCount').textContent = count;
 
-        if (!deliveryEmail) {
-            alert('Preencha o email de entrega');
+        if (document.getElementById('cartScreen').classList.contains('active')) {
+            renderCart();
+        }
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartItemsContainer');
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="bi bi-cart-x display-1 text-white-50 mb-3"></i>
+                        <h4 class="fw-bold">Seu carrinho está vazio</h4>
+                        <p class="text-white-75 mb-4">Adicione produtos para continuar</p>
+                        <button class="btn btn-gradient" onclick="showScreen('home')"
+                                style="background: var(--gradient-primary); border: none; color: white;">
+                            <i class="bi bi-shop me-2"></i>Ver Produtos
+                        </button>
+                    </div>
+                `;
+            document.getElementById('cartTotal').textContent = 'R$ 0,00';
+            return;
+        }
+
+        container.innerHTML = '';
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            container.innerHTML += `
+                    <div class="glass-card p-4 mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <img src="${item.image}" class="img-fluid rounded" alt="${item.title}" style="height: 80px; width: 100%; object-fit: cover;">
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="fw-bold">${item.title}</h6>
+                                <div class="text-warning">R$ ${item.price.toFixed(2)} cada</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-outline-light btn-sm" onclick="updateCartItem(${index}, -1)">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <span class="fw-bold">${item.quantity}</span>
+                                    <button class="btn btn-outline-light btn-sm" onclick="updateCartItem(${index}, 1)">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="fw-bold fs-5">R$ ${itemTotal.toFixed(2)}</div>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-outline-danger" onclick="removeCartItem(${index})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        });
+
+        document.getElementById('cartTotal').textContent = `R$ ${total.toFixed(2)}`;
+    }
+
+    function updateCartItem(index, change) {
+        const item = cart[index];
+        const newQuantity = item.quantity + change;
+
+        if (newQuantity >= 1 && newQuantity <= item.maxStock) {
+            cart[index].quantity = newQuantity;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+        } else if (newQuantity < 1) {
+            removeCartItem(index);
+        }
+    }
+
+    function removeCartItem(index) {
+        Swal.fire({
+            title: 'Remover item?',
+            text: 'Este item será removido do carrinho',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, remover',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cart.splice(index, 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartUI();
+            }
+        });
+    }
+
+    // Checkout Functions
+    function selectPayment(method) {
+        selectedPayment = method;
+
+        // Update UI
+        document.querySelectorAll('.payment-option-card').forEach(card => {
+            card.classList.remove('active');
+        });
+
+        event.currentTarget.classList.add('active');
+        document.getElementById('paymentMethod').value = method;
+    }
+
+    function applyCoupon() {
+        const code = document.getElementById('couponCode').value;
+
+        if (code === 'BYTE10') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Cupom aplicado!',
+                text: 'Desconto de 10% aplicado com sucesso',
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cupom inválido',
+                text: 'Este cupom não é válido ou já expirou',
+            });
+        }
+    }
+
+    async function proceedToPayment() {
+        const name = document.getElementById('customerName').value;
+        const email = document.getElementById('customerEmail').value;
+        const termsCheck = document.getElementById('termsCheck').checked;
+
+        if (!name || !email) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos obrigatórios',
+                text: 'Preencha seu nome e email para continuar',
+            });
+            return;
+        }
+
+        if (!termsCheck) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Termos e condições',
+                text: 'Você precisa aceitar os termos para continuar',
+            });
+            return;
+        }
+
+        if (!authToken) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Login necessário',
+                text: 'Faça login para finalizar a compra',
+            }).then(() => {
+                showScreen('login');
+            });
             return;
         }
 
         try {
-            // Buscar userId do usuário atual
-            const userResponse = await fetch('/auth/me', {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-
-            let userId;
-            if (!userResponse.ok) {
-                // Fallback: usar um UUID genérico se não conseguir buscar
-                userId = '00000000-0000-0000-0000-000000000000';
-            } else {
-                const userData = await userResponse.json();
-                userId = userData.id;
-            }
-
             const orderData = {
-                userId: userId,
-                deliveryEmail: deliveryEmail,
-                items: [{
-                    productId: currentProduct.id,
-                    quantity: quantity
-                }]
+                userId: currentUser?.id || '00000000-0000-0000-0000-000000000000',
+                deliveryEmail: email,
+                items: cart.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity
+                }))
             };
 
             const response = await fetch('/orders', {
@@ -873,7 +1923,7 @@
             if (response.ok) {
                 const order = await response.json();
 
-                // Criar pagamento PIX
+                // Create PIX payment
                 const paymentResponse = await fetch(`/payments/pix/orders/${order.id}`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${authToken}` }
@@ -881,41 +1931,50 @@
 
                 if (paymentResponse.ok) {
                     const payment = await paymentResponse.json();
+
+                    // Clear cart
+                    cart = [];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI();
+
+                    // Show PIX payment
                     showPixPayment(payment);
                 }
             } else {
                 const error = await response.json();
-                alert('Erro ao criar pedido: ' + (error.message || 'Erro desconhecido'));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro ao criar pedido',
+                    text: error.message || 'Erro desconhecido',
+                });
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao processar pedido');
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível processar o pedido',
+            });
         }
     }
 
     function showPixPayment(payment) {
-        // Formatar corretamente a imagem Base64
         const qrCodeSrc = payment.pixQrCode.startsWith('data:image')
             ? payment.pixQrCode
             : `data:image/png;base64,${payment.pixQrCode}`;
 
-        document.getElementById('pixQrCode').src = qrCodeSrc;
-        document.getElementById('pixCode').value = payment.pixQrCodeText;
+        document.getElementById('pixQrCodeImg').src = qrCodeSrc;
+        document.getElementById('pixCodeInput').value = payment.pixQrCodeText;
 
         const expiresAt = new Date(payment.expiresAt);
-        document.getElementById('expiresAt').textContent = `Expira em: ${expiresAt.toLocaleString('pt-BR')}`;
+        document.getElementById('pixExpiresAt').textContent = `Expira em: ${expiresAt.toLocaleString('pt-BR')}`;
 
         showScreen('pixPayment');
-
-        // Iniciar polling para verificar status do pagamento
         startPaymentPolling(payment.paymentId);
     }
 
     function startPaymentPolling(paymentId) {
-        // Limpar polling anterior se existir
-        if (paymentPolling) {
-            clearInterval(paymentPolling);
-        }
+        if (paymentPolling) clearInterval(paymentPolling);
 
         paymentPolling = setInterval(async () => {
             try {
@@ -929,90 +1988,110 @@
                     if (payment.status === 'APPROVED') {
                         clearInterval(paymentPolling);
 
-                        const statusDiv = document.getElementById('paymentStatusDiv');
-                        statusDiv.className = 'payment-status approved';
-                        statusDiv.innerHTML = '<i class="bi bi-check-circle me-2"></i>Pagamento Aprovado!';
-
-                        setTimeout(() => {
-                            alert('Pagamento confirmado! Confira seu email.');
-                            showScreen('myOrders');
-                        }, 2000);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pagamento aprovado!',
+                            text: 'Seu pedido foi confirmado e as credenciais foram enviadas para seu email',
+                            confirmButtonColor: '#f97316'
+                        }).then(() => {
+                            showScreen('home');
+                        });
                     }
                 }
             } catch (error) {
                 console.error('Erro ao verificar pagamento:', error);
             }
-        }, 5000); // Verifica a cada 5 segundos
+        }, 5000);
+    }
+
+    async function checkPaymentStatus() {
+        // This would check the current payment status
+        Swal.fire({
+            icon: 'info',
+            title: 'Verificando...',
+            text: 'Aguarde enquanto verificamos o status do pagamento',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 
     function copyPixCode() {
-        const pixCode = document.getElementById('pixCode');
-        pixCode.select();
+        const input = document.getElementById('pixCodeInput');
+        input.select();
+        input.setSelectionRange(0, 99999);
         document.execCommand('copy');
 
-        const btn = event.target.closest('button');
-        const originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-check"></i> Copiado!';
-
-        setTimeout(() => {
-            btn.innerHTML = originalHtml;
-        }, 2000);
+        Swal.fire({
+            icon: 'success',
+            title: 'Código copiado!',
+            text: 'O código PIX foi copiado para sua área de transferência',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 
-    // ==================== MEUS PEDIDOS ====================
-    async function loadMyOrders() {
-        try {
-            // Aqui você precisaria ter o userId do usuário logado
-            // Por simplicidade, vamos usar um endpoint genérico
-            const response = await fetch('/orders/my', {
-                headers: { 'Authorization': `Bearer ${authToken}` }
+    // Admin Functions
+    function loadAdminCategories() {
+        const tbody = document.getElementById('adminCategoriesTable');
+        tbody.innerHTML = '';
+
+        const categories = [
+            { id: 'ASSINATURAS', name: 'Assinaturas Premium' },
+            { id: 'KEYS', name: 'Keys Steam' },
+            { id: 'DISCORD', name: 'Discord' },
+            { id: 'CONTAS', name: 'Contas/Jogos' },
+            { id: 'UTILIDADES', name: 'Utilidades' },
+            { id: 'METODOS', name: 'Métodos' }
+        ];
+
+        categories.forEach(cat => {
+            const imageUrl = categoryImages[cat.id] || defaultCategoryImages[cat.id] || '';
+
+            tbody.innerHTML += `
+                    <tr>
+                        <td>${cat.id}</td>
+                        <td>${cat.name}</td>
+                        <td>
+                            <input type="text" class="form-control-custom form-control-sm"
+                                   value="${imageUrl}" readonly style="background: var(--bg-secondary);">
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-warning" onclick="editCategory('${cat.id}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+        });
+    }
+
+    function editCategory(categoryId) {
+        document.getElementById('editCategorySelect').value = categoryId;
+
+        const imageUrl = categoryImages[categoryId] || defaultCategoryImages[categoryId] || '';
+        document.getElementById('editCategoryImage').value = imageUrl;
+        document.getElementById('categoryImagePreview').src = imageUrl;
+    }
+
+    function saveCategoryImage() {
+        const categoryId = document.getElementById('editCategorySelect').value;
+        const imageUrl = document.getElementById('editCategoryImage').value;
+
+        if (imageUrl) {
+            categoryImages[categoryId] = imageUrl;
+            localStorage.setItem('categoryImages', JSON.stringify(categoryImages));
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Imagem salva!',
+                text: 'A imagem da categoria foi atualizada com sucesso',
             });
 
-            const orders = await response.json();
-            const container = document.getElementById('ordersList');
-            container.innerHTML = '';
-
-            if (orders.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted">Você ainda não fez nenhum pedido</p>';
-                return;
-            }
-
-            orders.forEach(order => {
-                container.innerHTML += `
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5>Pedido #${order.orderId}</h5>
-                                <p class="text-muted mb-2">${new Date(order.orderDate).toLocaleString('pt-BR')}</p>
-                                <p class="mb-0">Total: <strong>R$ ${order.total.toFixed(2)}</strong></p>
-                            </div>
-                            <span class="badge ${order.status === 'PAID' ? 'bg-success' : 'bg-warning'}">
-                                ${order.status === 'PAID' ? 'Pago' : 'Aguardando Pagamento'}
-                            </span>
-                        </div>
-
-                        <hr>
-
-                        <h6>Itens:</h6>
-                        <ul class="list-unstyled">
-                            ${order.items.map(item => `
-                                <li>
-                                    <i class="bi bi-box me-2"></i>
-                                    ${item.productTitle} - ${item.quantity}x - R$ ${item.price.toFixed(2)}
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                </div>
-            `;
-            });
-        } catch (error) {
-            console.error('Erro ao carregar pedidos:', error);
+            loadCategories();
+            loadAdminCategories();
         }
     }
 
-    // ==================== ADMIN - PRODUTOS ====================
     async function loadAdminProducts() {
         try {
             const response = await fetch('/products', {
@@ -1020,44 +2099,72 @@
             });
             const data = await response.json();
 
-            const tbody = document.getElementById('adminProductsList');
+            const tbody = document.getElementById('adminProductsTable');
             tbody.innerHTML = '';
 
             data.content.forEach(product => {
                 tbody.innerHTML += `
-                <tr>
-                    <td>${product.id}</td>
-                    <td>${product.title}</td>
-                    <td>R$ ${product.price.toFixed(2)}</td>
-                    <td>${product.type === 'AUTOMATIC_DELIVERY' ? 'Entrega Automática' : 'Serviço'}</td>
-                    <td>${product.availableStock}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="editProduct(${product.id})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+                        <tr>
+                            <td>${product.id}</td>
+                            <td>${product.title}</td>
+                            <td>${product.type}</td>
+                            <td>R$ ${product.price.toFixed(2)}</td>
+                            <td>${product.availableStock}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning me-2" onclick="editProduct(${product.id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${product.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
             });
         } catch (error) {
-            console.error('Erro ao carregar produtos:', error);
+            console.error('Erro:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível carregar os produtos',
+            });
         }
     }
 
     function showProductForm(productId = null) {
         if (productId) {
-            document.getElementById('formTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Editar Produto';
-            // Carregar dados do produto para edição
+            document.getElementById('productFormTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Editar Produto';
             loadProductForEdit(productId);
         } else {
-            document.getElementById('formTitle').innerHTML = '<i class="bi bi-plus me-2"></i>Novo Produto';
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
+            document.getElementById('productFormTitle').innerHTML = '<i class="bi bi-plus-circle me-2"></i>Novo Produto';
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productTitle').value = '';
+            document.getElementById('productCategory').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productImage').value = '';
+
+            if (quillEditor) {
+                quillEditor.root.innerHTML = '';
+            }
         }
-        showScreen('productForm');
+
+        showScreen('adminProductForm');
+
+        if (!quillEditor) {
+            quillEditor = new Quill('#descriptionEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'header': [1, 2, 3, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                }
+            });
+        }
     }
 
     async function loadProductForEdit(id) {
@@ -1065,26 +2172,34 @@
             const response = await fetch(`/products/${id}`);
             const product = await response.json();
 
-            document.getElementById('productId').value = product.id;
+            document.getElementById('editProductId').value = product.id;
             document.getElementById('productTitle').value = product.title;
-            document.getElementById('productDescription').value = product.description;
+            document.getElementById('productCategory').value = product.type;
             document.getElementById('productPrice').value = product.price;
-            document.getElementById('productType').value = product.type;
             document.getElementById('productImage').value = product.imageUrl;
+
+            if (quillEditor) {
+                quillEditor.root.innerHTML = product.description;
+            }
         } catch (error) {
-            console.error('Erro ao carregar produto:', error);
+            console.error('Erro:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível carregar o produto',
+            });
         }
     }
 
     async function saveProduct(e) {
         e.preventDefault();
 
-        const id = document.getElementById('productId').value;
+        const id = document.getElementById('editProductId').value;
         const data = {
             title: document.getElementById('productTitle').value,
-            description: document.getElementById('productDescription').value,
+            description: quillEditor.root.innerHTML,
             price: parseFloat(document.getElementById('productPrice').value),
-            type: document.getElementById('productType').value,
+            type: document.getElementById('productCategory').value,
             imageUrl: document.getElementById('productImage').value
         };
 
@@ -1102,41 +2217,72 @@
             });
 
             if (response.ok) {
-                alert('Produto salvo com sucesso!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Produto salvo!',
+                    text: 'O produto foi salvo com sucesso',
+                });
+
                 showScreen('adminProducts');
                 loadAdminProducts();
+                loadProducts();
             } else {
-                alert('Erro ao salvar produto');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro ao salvar',
+                    text: 'Não foi possível salvar o produto',
+                });
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao salvar produto');
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível salvar o produto',
+            });
         }
     }
 
     async function deleteProduct(id) {
-        if (!confirm('Deseja realmente excluir este produto?')) return;
+        Swal.fire({
+            title: 'Excluir produto?',
+            text: 'Esta ação não pode ser desfeita',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/products/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
 
-        try {
-            const response = await fetch(`/admin/products/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Excluído!',
+                            text: 'Produto excluído com sucesso',
+                        });
 
-            if (response.ok) {
-                alert('Produto excluído!');
-                loadAdminProducts();
+                        loadAdminProducts();
+                        loadProducts();
+                    }
+                } catch (error) {
+                    console.error('Erro ao excluir:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Não foi possível excluir o produto',
+                    });
+                }
             }
-        } catch (error) {
-            console.error('Erro ao excluir:', error);
-        }
+        });
     }
 
-    function editProduct(id) {
-        showProductForm(id);
-    }
-
-    // ==================== ADMIN - ESTOQUE ====================
     async function loadStockProducts() {
         try {
             const response = await fetch('/products');
@@ -1147,13 +2293,34 @@
 
             data.content.forEach(product => {
                 select.innerHTML += `
-                <option value="${product.id}">
-                    ${product.title} (${product.availableStock} em estoque)
-                </option>
-            `;
+                        <option value="${product.id}">
+                            ${product.title} (${product.availableStock} em estoque)
+                        </option>
+                    `;
+            });
+
+            // Add event listener to show stock info
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    const product = data.content.find(p => p.id == this.value);
+                    if (product) {
+                        document.getElementById('stockInfo').innerHTML = `
+                                <div>
+                                    <h6 class="fw-bold">${product.title}</h6>
+                                    <p class="text-white-75">Estoque atual: ${product.availableStock} itens</p>
+                                    <p class="text-white-75">Preço: R$ ${product.price.toFixed(2)}</p>
+                                </div>
+                            `;
+                    }
+                }
             });
         } catch (error) {
-            console.error('Erro ao carregar produtos:', error);
+            console.error('Erro:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível carregar os produtos',
+            });
         }
     }
 
@@ -1163,10 +2330,27 @@
         const productId = document.getElementById('stockProductId').value;
         const itemsText = document.getElementById('stockItems').value;
 
-        // Converter texto em array de objetos
+        if (!productId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Selecione um produto',
+                text: 'Escolha um produto para adicionar estoque',
+            });
+            return;
+        }
+
         const items = itemsText.split('\n')
             .filter(line => line.trim())
             .map(line => ({ content: line.trim() }));
+
+        if (items.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Nenhum item',
+                text: 'Digite pelo menos um item para adicionar ao estoque',
+            });
+            return;
+        }
 
         try {
             const response = await fetch(`/admin/products/${productId}/stock`, {
@@ -1179,35 +2363,53 @@
             });
 
             if (response.ok) {
-                alert(`${items.length} itens adicionados ao estoque!`);
-                document.getElementById('stockForm').reset();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Estoque adicionado!',
+                    text: `${items.length} itens foram adicionados ao estoque`,
+                });
+
+                document.getElementById('stockItems').value = '';
+                loadProducts();
             } else {
-                alert('Erro ao adicionar estoque');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Não foi possível adicionar ao estoque',
+                });
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao adicionar estoque');
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível adicionar ao estoque',
+            });
         }
     }
 
-    // ==================== NAVEGAÇÃO ====================
+    // Utility Functions
+    function openSupport() {
+        window.open('https://discord.gg/seuservidor', '_blank');
+    }
+
     function showScreen(screenName) {
-        // Esconder todas as telas
+        // Hide all screens
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
         });
 
-        // Mostrar tela solicitada
+        // Show requested screen
         const screens = {
             'home': 'homeScreen',
             'productDetails': 'productDetailsScreen',
-            'login': 'loginScreen',
-            'register': 'registerScreen',
-            'orderConfirmation': 'orderConfirmationScreen',
+            'checkout': 'checkoutScreen',
             'pixPayment': 'pixPaymentScreen',
-            'myOrders': 'myOrdersScreen',
+            'cart': 'cartScreen',
+            'login': 'loginScreen',
+            'adminCategories': 'adminCategoriesScreen',
             'adminProducts': 'adminProductsScreen',
-            'productForm': 'productFormScreen',
+            'adminProductForm': 'adminProductFormScreen',
             'adminStock': 'adminStockScreen'
         };
 
@@ -1215,31 +2417,41 @@
         if (screenId) {
             document.getElementById(screenId).classList.add('active');
 
-            // Carregar dados específicos da tela
-            if (screenName === 'myOrders') loadMyOrders();
+            // Load specific data for screens
+            if (screenName === 'cart') renderCart();
+            if (screenName === 'adminCategories') loadAdminCategories();
             if (screenName === 'adminProducts') loadAdminProducts();
             if (screenName === 'adminStock') loadStockProducts();
         }
 
-        // Scroll para o topo
+        // Scroll to top
         window.scrollTo(0, 0);
     }
 
-    // ==================== UTILIDADES ====================
-    function showError(elementId, message) {
-        const el = document.getElementById(elementId);
-        el.textContent = message;
-        el.classList.remove('d-none');
-        setTimeout(() => el.classList.add('d-none'), 5000);
-    }
-
-    function showSuccess(elementId, message) {
-        const el = document.getElementById(elementId);
-        el.textContent = message;
-        el.classList.remove('d-none');
-        setTimeout(() => el.classList.add('d-none'), 5000);
-    }
+    // Add to global scope for HTML onclick events
+    window.showScreen = showScreen;
+    window.logout = logout;
+    window.openSupport = openSupport;
+    window.viewProductDetails = viewProductDetails;
+    window.filterByCategory = filterByCategory;
+    window.sortProducts = sortProducts;
+    window.updateQuantity = updateQuantity;
+    window.addToCart = addToCart;
+    window.buyNow = buyNow;
+    window.updateCartItem = updateCartItem;
+    window.removeCartItem = removeCartItem;
+    window.selectPayment = selectPayment;
+    window.applyCoupon = applyCoupon;
+    window.proceedToPayment = proceedToPayment;
+    window.copyPixCode = copyPixCode;
+    window.checkPaymentStatus = checkPaymentStatus;
+    window.editCategory = editCategory;
+    window.saveCategoryImage = saveCategoryImage;
+    window.showProductForm = showProductForm;
+    window.editProduct = editProduct;
+    window.deleteProduct = deleteProduct;
+    window.addStock = addStock;
+    window.handleLogin = handleLogin;
 </script>
-
 </body>
 </html>

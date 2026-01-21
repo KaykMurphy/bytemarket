@@ -60,8 +60,19 @@ public class OrderService {
 
             List<String> deliveredCodes = new ArrayList<>();
 
-            // Se for entrega automática, validar e reservar estoque
-            if (product.getType() == ProductType.AUTOMATIC_DELIVERY) {
+            // Verifica se o produto é de um tipo que requer entrega automática de estoque
+            boolean isAutomaticDelivery =
+                    product.getType() == ProductType.AUTOMATIC_DELIVERY ||
+                            product.getType() == ProductType.ASSINATURAS ||
+                            product.getType() == ProductType.KEYS ||
+                            product.getType() == ProductType.CONTAS ||
+                            product.getType() == ProductType.STREAMING ||
+                            product.getType() == ProductType.DISCORD ||
+                            product.getType() == ProductType.UTILIDADES ||
+                            product.getType() == ProductType.METODOS;
+
+
+            if (isAutomaticDelivery) {
 
                 // Validar estoque disponível ANTES de processar
                 stockValidator.validateAvailability(product, quantity);
