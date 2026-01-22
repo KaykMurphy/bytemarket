@@ -45,12 +45,12 @@ public class PixPaymentService {
             return mapToDTO(payment);
 
         } catch (MPApiException e) {
-            log.error("❌ Erro API Mercado Pago: {} - {}", e.getStatusCode(), e.getApiResponse().getContent());
+            log.error("Erro API Mercado Pago: {} - {}", e.getStatusCode(), e.getApiResponse().getContent());
             // Mostra o erro real da API para facilitar o debug
             throw new RuntimeException("Erro na API de Pagamento: " + e.getApiResponse().getContent());
 
         } catch (MPException e) {
-            log.error("❌ Erro Mercado Pago: {}", e.getMessage());
+            log.error("Erro Mercado Pago: {}", e.getMessage());
             throw new RuntimeException("Erro de conexão com Pagamento: " + e.getMessage());
         }
     }
@@ -79,11 +79,11 @@ public class PixPaymentService {
                         .build())
                 .build();
 
-        log.info("🔄 Criando pagamento PIX de R$ {}", amount);
+        log.info("Criando pagamento PIX de R$ {}", amount);
 
         Payment payment = client.create(request);
 
-        log.info("✅ Pagamento PIX criado: ID={}, Status={}",
+        log.info("Pagamento PIX criado: ID={}, Status={}",
                 payment.getId(), payment.getStatus());
 
         return payment;

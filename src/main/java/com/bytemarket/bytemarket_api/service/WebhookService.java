@@ -26,7 +26,7 @@ public class WebhookService {
 
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
-    private final StockItemRepository stockItemRepository; // Novo repository
+    private final StockItemRepository stockItemRepository;
     private final EmailService emailService;
 
     @Value("${payment.mercadopago.webhook-secret:}")
@@ -34,10 +34,11 @@ public class WebhookService {
 
     @Transactional
     public void processMercadoPagoWebhook(String type, String dataId, String xSignature, String xRequestId) {
-        log.info("📨 Webhook recebido: type={}, dataId={}", type, dataId);
+        // Log para debug
+        log.info("Validando Webhook: ID={}, Signature={}, RequestId={}", dataId, xSignature, xRequestId);
 
         if (!validateMercadoPagoSignature(xSignature, xRequestId, dataId)) {
-            log.warn("⚠️ Webhook com assinatura inválida rejeitado");
+            log.warn("Assinatura inválida! Verifique se o Secret no properties é igual ao do Painel MP (Modo Produção).");
             throw new SecurityException("Assinatura do webhook inválida");
         }
 
@@ -54,7 +55,7 @@ public class WebhookService {
             processPaymentStatusChange(payment, mpPayment);
 
         } catch (Exception e) {
-            log.error("❌ Erro ao processar webhook: {}", e.getMessage(), e);
+            log.error("Erro ao processar webhook: {}", e.getMessage(), e);
             throw new RuntimeException("Erro ao processar webhook", e);
         }
     }
@@ -62,6 +63,8 @@ public class WebhookService {
     private void processPaymentStatusChange(com.bytemarket.bytemarket_api.domain.Payment payment, Payment mpPayment) {
         String mpStatus = mpPayment.getStatus();
         PaymentStatus newStatus = mapStatus(mpStatus);
+
+        log.info("tualizando status: De {} para {}", payment.getStatus(), newStatus);
 
         if (payment.getStatus() == newStatus) return;
 
@@ -73,12 +76,8 @@ public class WebhookService {
             order.setStatus(Status.PAID);
             orderRepository.save(order);
 
-            // LOGICA DE ENTREGA DE PRODUTOS
             try {
-                // 1. Busca os itens reservados para este pedido
                 List<StockItem> reservedItems = stockItemRepository.findByOrder(order);
-
-                // 2. Organiza os códigos para envio (List<List<String>>)
                 List<List<String>> codesPerItem = new ArrayList<>();
 
                 for (OrderItem orderItem : order.getItems()) {
@@ -89,12 +88,11 @@ public class WebhookService {
                     codesPerItem.add(codes);
                 }
 
-                // 3. Envia o email com os produtos
-                log.info("🚀 Pagamento Aprovado! Enviando produtos para {}", order.getDeliveryEmail());
+                log.info("Pagamento Aprovado! Enviando produtos para {}", order.getDeliveryEmail());
                 emailService.sendOrderConfirmation(order, codesPerItem);
 
             } catch (Exception e) {
-                log.error("❌ Erro ao entregar produtos: {}", e.getMessage());
+                log.error("Erro ao entregar produtos: {}", e.getMessage());
             }
         }
 
@@ -103,11 +101,11 @@ public class WebhookService {
 
     private boolean validateMercadoPagoSignature(String xSignature, String xRequestId, String dataId) {
         if (webhookSecret == null || webhookSecret.isBlank()) {
-            log.warn("⚠️ Webhook secret não configurado");
+            log.warn("Webhook secret não configurado");
             return true;
         }
 
-        if (xSignature == null || xSignature.isBlank()) {
+        if (xSignature == null || xSignature.isBlank() || xRequestId == null || dataId == null) {
             return false;
         }
 
@@ -117,12 +115,14 @@ public class WebhookService {
             String hash = null;
 
             for (String part : parts) {
-                String[] keyValue = part.split("=", 2);
+                String[] keyValue = part.trim().split("=", 2);
                 if (keyValue.length == 2) {
-                    if ("ts".equals(keyValue[0])) {
-                        ts = keyValue[1];
-                    } else if ("v1".equals(keyValue[0])) {
-                        hash = keyValue[1];
+                    String key = keyValue[0].trim();
+                    String value = keyValue[1].trim();
+                    if ("ts".equals(key)) {
+                        ts = value;
+                    } else if ("v1".equals(key)) {
+                        hash = value;
                     }
                 }
             }
@@ -138,7 +138,7 @@ public class WebhookService {
             return expectedHash.equals(hash);
 
         } catch (Exception e) {
-            log.error("❌ Erro ao validar assinatura: {}", e.getMessage());
+            log.error("Erro ao validar assinatura: {}", e.getMessage());
             return false;
         }
     }

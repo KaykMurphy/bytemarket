@@ -40,7 +40,7 @@ public class EmailService {
 
             helper.setFrom(fromEmail, fromName);
             helper.setTo(order.getDeliveryEmail());
-            helper.setSubject("✅ Pedido #" + order.getId() + " Confirmado - ByteMarket");
+            helper.setSubject("Pedido #" + order.getId() + " Confirmado - ByteMarket");
 
             Context context = new Context();
             context.setVariable("orderId", order.getId());
@@ -52,10 +52,10 @@ public class EmailService {
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
-            log.info("✅ Email enviado com sucesso!");
+            log.info("Email enviado com sucesso!");
 
         } catch (Exception e) {
-            log.warn("⚠️ FALHA NO ENVIO DE EMAIL (Verifique suas credenciais no application.properties): {}", e.getMessage());
+            log.warn("FALHA NO ENVIO DE EMAIL (Verifique suas credenciais no application.properties): {}", e.getMessage());
         }
     }
 
@@ -66,7 +66,7 @@ public class EmailService {
 
             helper.setFrom(fromEmail, fromName);
             helper.setTo(order.getDeliveryEmail());
-            helper.setSubject("💰 Pagamento Aprovado - Pedido #" + order.getId());
+            helper.setSubject("Pagamento Aprovado - Pedido #" + order.getId());
 
             Context context = new Context();
             context.setVariable("orderId", order.getId());
@@ -79,7 +79,7 @@ public class EmailService {
             log.info("Email de pagamento aprovado enviado para: {}", order.getDeliveryEmail());
 
         } catch (Exception e) {
-            log.warn("⚠️ Falha ao enviar email de pagamento aprovado: {}", e.getMessage());
+            log.warn("Falha ao enviar email de pagamento aprovado: {}", e.getMessage());
         }
     }
 

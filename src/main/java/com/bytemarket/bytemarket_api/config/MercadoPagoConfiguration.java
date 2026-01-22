@@ -17,9 +17,9 @@ public class MercadoPagoConfiguration {
     public void init() {
         try {
             MercadoPagoConfig.setAccessToken(accessToken);
-            log.info("✅ Mercado Pago configurado com sucesso");
+            log.info("Mercado Pago configurado com sucesso");
         } catch (Exception e) {
-            log.error("❌ Erro ao configurar Mercado Pago: {}", e.getMessage());
+            log.error("Erro ao configurar Mercado Pago: {}", e.getMessage());
             throw new RuntimeException("Falha na configuração do Mercado Pago", e);
         }
     }
