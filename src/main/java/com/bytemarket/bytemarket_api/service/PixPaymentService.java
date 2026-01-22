@@ -3,7 +3,6 @@ package com.bytemarket.bytemarket_api.service;
 import com.bytemarket.bytemarket_api.domain.*;
 import com.bytemarket.bytemarket_api.dto.response.PixPaymentResponseDTO;
 import com.bytemarket.bytemarket_api.repository.PaymentRepository;
-import com.mercadopago.client.common.IdentificationRequest;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.payment.PaymentCreateRequest;
 import com.mercadopago.client.payment.PaymentPayerRequest;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
@@ -46,41 +46,40 @@ public class PixPaymentService {
 
         } catch (MPApiException e) {
             log.error("❌ Erro API Mercado Pago: {} - {}", e.getStatusCode(), e.getApiResponse().getContent());
-            throw new RuntimeException("Erro ao criar pagamento PIX: " + e.getMessage());
+            // Mostra o erro real da API para facilitar o debug
+            throw new RuntimeException("Erro na API de Pagamento: " + e.getApiResponse().getContent());
 
         } catch (MPException e) {
             log.error("❌ Erro Mercado Pago: {}", e.getMessage());
-            throw new RuntimeException("Erro ao conectar com Mercado Pago: " + e.getMessage());
+            throw new RuntimeException("Erro de conexão com Pagamento: " + e.getMessage());
         }
     }
 
-    /**
-     * Cria pagamento PIX no Mercado Pago
-     */
     private Payment createMercadoPagoPixPayment(com.bytemarket.bytemarket_api.domain.Order order)
             throws MPException, MPApiException {
 
         PaymentClient client = new PaymentClient();
 
-        // Data de expiração do PIX
         OffsetDateTime expirationDate = OffsetDateTime.now(ZoneOffset.UTC)
                 .plusMinutes(expirationMinutes);
 
-        // Construir requisição
+        // CORREÇÃO AQUI: Arredondamento para 2 casas decimais
+        BigDecimal amount = order.getTotal().setScale(2, RoundingMode.HALF_EVEN);
+
         PaymentCreateRequest request = PaymentCreateRequest.builder()
-                .transactionAmount(order.getTotal())
+                .transactionAmount(amount) // Envia o valor corrigido (ex: 49.90)
                 .description("Pedido #" + order.getId() + " - ByteMarket")
                 .paymentMethodId("pix")
                 .dateOfExpiration(expirationDate)
-                .notificationUrl(baseUrl + "/webhooks/payment") // URL do webhook
-                .externalReference(order.getId().toString()) // Referência do pedido
+                .notificationUrl(baseUrl + "/webhooks/payment")
+                .externalReference(order.getId().toString())
                 .payer(PaymentPayerRequest.builder()
                         .email(order.getDeliveryEmail())
                         .firstName(order.getUser().getName())
                         .build())
                 .build();
 
-        log.info("🔄 Criando pagamento PIX no Mercado Pago para pedido {}", order.getId());
+        log.info("🔄 Criando pagamento PIX de R$ {}", amount);
 
         Payment payment = client.create(request);
 
@@ -90,9 +89,6 @@ public class PixPaymentService {
         return payment;
     }
 
-    /**
-     * Salva pagamento no banco de dados
-     */
     private com.bytemarket.bytemarket_api.domain.Payment savePayment(
             com.bytemarket.bytemarket_api.domain.Order order,
             Payment mercadoPagoPayment) {
@@ -107,7 +103,6 @@ public class PixPaymentService {
         payment.setOrder(order);
         payment.setExpiresAt(mercadoPagoPayment.getDateOfExpiration().toInstant());
 
-        // Extrair QR Code
         if (mercadoPagoPayment.getPointOfInteraction() != null
                 && mercadoPagoPayment.getPointOfInteraction().getTransactionData() != null) {
 
@@ -125,10 +120,9 @@ public class PixPaymentService {
         return paymentRepository.save(payment);
     }
 
-    /**
-     * Mapeia status do Mercado Pago para  enum
-     */
     private PaymentStatus mapMercadoPagoStatus(String mpStatus) {
+        if (mpStatus == null) return PaymentStatus.PENDING;
+
         return switch (mpStatus) {
             case "approved" -> PaymentStatus.APPROVED;
             case "rejected" -> PaymentStatus.REJECTED;
@@ -139,9 +133,6 @@ public class PixPaymentService {
         };
     }
 
-    /**
-     * Mapeia Payment para DTO de resposta
-     */
     private PixPaymentResponseDTO mapToDTO(com.bytemarket.bytemarket_api.domain.Payment payment) {
         return new PixPaymentResponseDTO(
                 payment.getId(),
@@ -155,9 +146,6 @@ public class PixPaymentService {
         );
     }
 
-    /**
-     * Busca status atual do pagamento no Mercado Pago
-     */
     @Transactional(readOnly = true)
     public PixPaymentResponseDTO getPaymentStatus(Long paymentId) {
         com.bytemarket.bytemarket_api.domain.Payment payment =
@@ -165,11 +153,9 @@ public class PixPaymentService {
                         .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
 
         try {
-            // Consultar status atualizado no Mercado Pago
             PaymentClient client = new PaymentClient();
             Payment mpPayment = client.get(Long.parseLong(payment.getExternalId()));
 
-            // Atualizar status local se necessário
             PaymentStatus newStatus = mapMercadoPagoStatus(mpPayment.getStatus());
             if (payment.getStatus() != newStatus) {
                 payment.setStatus(newStatus);

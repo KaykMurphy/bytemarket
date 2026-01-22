@@ -24,4 +24,5 @@ public interface StockItemRepository extends JpaRepository<StockItem, Long> {
 
     long countByProductAndSoldFalse(Product product);
 
+    List<StockItem> findByOrder(Order order);
 }

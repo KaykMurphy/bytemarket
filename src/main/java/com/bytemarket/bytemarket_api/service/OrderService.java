@@ -33,24 +33,30 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final EmailValidator emailValidator;
     private final StockValidator stockValidator;
-    private final EmailService emailService;
 
     @Transactional
     public OrderReceiptDTO placeOrder(OrderRequestDTO dto) {
 
-        // Validar email de entrega
         emailValidator.validate(dto.deliveryEmail());
 
-        // Buscar usuário
         UUID userId = dto.userId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
-        List<List<String>> codesPerItem = new ArrayList<>();
 
-        // Processar cada item do pedido
+        // Criar o objeto Order primeiro para poder vincular os itens de estoque a ele
+        Order order = new Order();
+        order.setMoment(Instant.now());
+        order.setStatus(Status.WAITING_PAYMENT);
+        order.setDeliveryEmail(dto.deliveryEmail());
+        order.setUser(user);
+
+        // Salva o pedido preliminarmente para ter o ID/Referência
+        Order savedOrder = orderRepository.save(order);
+
+        // Processar itens
         for (OrderItemDTO item : dto.items()) {
             Long productId = item.productId();
             Integer quantity = item.quantity();
@@ -58,9 +64,6 @@ public class OrderService {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
-            List<String> deliveredCodes = new ArrayList<>();
-
-            // Verifica se o produto é de um tipo que requer entrega automática de estoque
             boolean isAutomaticDelivery =
                     product.getType() == ProductType.AUTOMATIC_DELIVERY ||
                             product.getType() == ProductType.ASSINATURAS ||
@@ -71,68 +74,42 @@ public class OrderService {
                             product.getType() == ProductType.UTILIDADES ||
                             product.getType() == ProductType.METODOS;
 
-
             if (isAutomaticDelivery) {
-
-                // Validar estoque disponível ANTES de processar
                 stockValidator.validateAvailability(product, quantity);
 
-                // Reservar itens do estoque
                 List<StockItem> stockItems = stockItemRepository.findByProductAndSoldFalse(
                         product,
                         PageRequest.of(0, quantity)
                 );
 
                 for (StockItem stockItem : stockItems) {
-                    stockItem.setSold(true);
+                    stockItem.setSold(true); // Marca como vendido (reservado)
+                    stockItem.setOrder(savedOrder); // VINCULA AO PEDIDO
                     stockItemRepository.save(stockItem);
-                    deliveredCodes.add(stockItem.getContent());
                 }
             }
 
-            codesPerItem.add(deliveredCodes);
-
-            // Calcular total
             total = total.add(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
-
-            // Criar item do pedido
-            orderItems.add(new OrderItem(null, quantity, product.getPrice(), null, product));
+            orderItems.add(new OrderItem(null, quantity, product.getPrice(), savedOrder, product));
         }
 
-        // Criar pedido (status WAITING_PAYMENT)
-        Order order = new Order();
-        order.setMoment(Instant.now());
-        order.setTotal(total);
-        order.setStatus(Status.WAITING_PAYMENT); // Aguardando pagamento PIX
-        order.setDeliveryEmail(dto.deliveryEmail());
-        order.setUser(user);
-        order.setItems(orderItems);
+        // Atualiza totais e itens do pedido
+        savedOrder.setTotal(total);
+        savedOrder.setItems(orderItems);
+        orderRepository.save(savedOrder);
 
-        // Associar items ao pedido
-        order.getItems().forEach(item -> item.setOrder(order));
-
-        Order savedOrder = orderRepository.save(order);
-
-        // Enviar email com as contas (apenas se já foram reservadas)
-        if (!codesPerItem.isEmpty() && codesPerItem.stream().anyMatch(list -> !list.isEmpty())) {
-            emailService.sendOrderConfirmation(savedOrder, codesPerItem);
-        }
-
-        return buildReceipt(savedOrder, codesPerItem);
+        return buildReceipt(savedOrder);
     }
 
-    private OrderReceiptDTO buildReceipt(Order order, List<List<String>> codesPerItem) {
+    private OrderReceiptDTO buildReceipt(Order order) {
         List<OrderItemReceiptResponseDTO> itemsResponse = new ArrayList<>();
 
-        for (int i = 0; i < order.getItems().size(); i++) {
-            OrderItem item = order.getItems().get(i);
-            List<String> codes = codesPerItem.get(i);
-
+        for (OrderItem item : order.getItems()) {
             itemsResponse.add(new OrderItemReceiptResponseDTO(
                     item.getProduct().getTitle(),
                     item.getQuantity(),
                     item.getPrice(),
-                    codes
+                    null
             ));
         }
 
