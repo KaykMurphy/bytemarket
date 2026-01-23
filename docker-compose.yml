@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  bytemarket-db:
+    image: postgres:15
+    container_name: bytemarket-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  bytemarket-api:
+    build: .
+    container_name: bytemarket-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - bytemarket-db
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
