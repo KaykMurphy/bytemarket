@@ -46,7 +46,7 @@ public class PixPaymentService {
 
         } catch (MPApiException e) {
             log.error("Erro API Mercado Pago: {} - {}", e.getStatusCode(), e.getApiResponse().getContent());
-            // Mostra o erro real da API para facilitar o debug
+            // Mostra o erro real da API 
             throw new RuntimeException("Erro na API de Pagamento: " + e.getApiResponse().getContent());
 
         } catch (MPException e) {
@@ -63,11 +63,10 @@ public class PixPaymentService {
         OffsetDateTime expirationDate = OffsetDateTime.now(ZoneOffset.UTC)
                 .plusMinutes(expirationMinutes);
 
-        // CORREÇÃO AQUI: Arredondamento para 2 casas decimais
         BigDecimal amount = order.getTotal().setScale(2, RoundingMode.HALF_EVEN);
 
         PaymentCreateRequest request = PaymentCreateRequest.builder()
-                .transactionAmount(amount) // Envia o valor corrigido (ex: 49.90)
+                .transactionAmount(amount) // Envia o valor (ex: 49.90)
                 .description("Pedido #" + order.getId() + " - ByteMarket")
                 .paymentMethodId("pix")
                 .dateOfExpiration(expirationDate)
