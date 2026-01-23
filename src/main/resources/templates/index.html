@@ -59,7 +59,7 @@
         .navbar-brand {
             font-weight: 800;
             font-size: 1.5rem;
-            color: var(--action-info) !important; /* Alterado para azul */
+            color: var(--action-info) !important;
         }
 
         .nav-link {
@@ -668,6 +668,92 @@
             color: var(--text-primary);
         }
 
+        /* ========== SOCIAL PROOF NOTIFICATIONS ========== */
+        .social-proof-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+        }
+
+        .social-proof-notification {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideInLeft 0.5s ease-out, slideOutLeft 0.5s ease-in 4.5s forwards;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .social-proof-notification:hover {
+            transform: translateX(5px);
+        }
+
+        .social-proof-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--action-success), var(--action-info));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .social-proof-content {
+            flex: 1;
+        }
+
+        .social-proof-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .social-proof-action {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+
+        .social-proof-time {
+            color: var(--action-success);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutLeft {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
@@ -694,6 +780,12 @@
             .cart-item-image {
                 width: 100%;
                 height: 200px;
+            }
+
+            .social-proof-container {
+                left: 10px;
+                bottom: 10px;
+                width: calc(100vw - 20px);
             }
         }
     </style>
@@ -725,6 +817,12 @@
 
                 <li class="nav-item" id="loginNavBtn">
                     <a class="nav-link" href="#" onclick="showScreen('login')">Entrar</a>
+                </li>
+
+                <li class="nav-item" id="registerNavBtn">
+                    <a class="nav-link" href="#" onclick="showScreen('register')">
+                        <i class="bi bi-person-plus me-1"></i>Criar Conta
+                    </a>
                 </li>
 
                 <li class="nav-item d-none" id="myOrdersNavBtn">
@@ -788,12 +886,10 @@
             <div class="product-details-container">
                 <div class="product-details-top">
                     <div class="row">
-                        <!-- Coluna da Imagem -->
                         <div class="col-lg-6 mb-4 mb-lg-0">
                             <img id="productDetailImage" class="product-details-image" src="" alt="">
                         </div>
 
-                        <!-- Coluna das Informações -->
                         <div class="col-lg-6">
                             <div class="product-main-info">
                                 <h1 id="productDetailTitle">Carregando...</h1>
@@ -802,12 +898,10 @@
                                     <span id="productDetailPrice">R$ 0,00</span>
                                 </div>
 
-                                <!-- Status do Estoque -->
                                 <div class="mb-3">
                                     <span class="product-stock" id="productDetailStock">Carregando...</span>
                                 </div>
 
-                                <!-- Badges de Informação -->
                                 <div class="mb-4">
                                     <div class="info-badge">
                                         <i class="bi bi-lightning-charge-fill"></i>
@@ -819,7 +913,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Seletor de Quantidade -->
                                 <div class="quantity-selector-clean">
                                     <label style="font-weight: 700;">Quantidade:</label>
                                     <div class="d-flex align-items-center gap-2">
@@ -829,7 +922,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Botões de Ação -->
                                 <div class="action-buttons">
                                     <button class="btn-buy-now" onclick="buyNowDetail()">
                                         <i class="bi bi-lightning-fill"></i>
@@ -841,7 +933,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Métodos de Pagamento -->
                                 <div class="mt-4">
                                     <small style="color: var(--text-secondary); display: block; margin-bottom: 0.5rem; font-weight: 600;">
                                         Métodos de pagamento aceitos:
@@ -863,14 +954,12 @@
                     </div>
                 </div>
 
-                <!-- Descrição Detalhada -->
                 <div class="description-section">
                     <h3><i class="bi bi-card-text me-2"></i>Descrição do Produto</h3>
                     <div id="productDetailDescription" style="line-height: 1.8; color: var(--text-secondary);">
                         Carregando descrição...
                     </div>
 
-                    <!-- Características -->
                     <div class="feature-cards">
                         <div class="feature-card">
                             <div class="feature-icon">
@@ -904,11 +993,9 @@
                     </div>
                 </div>
 
-                <!-- Produtos Similares -->
                 <div class="similar-products-section">
                     <h3><i class="bi bi-grid-3x3-gap me-2"></i>Produtos Similares</h3>
                     <div id="similarProducts" class="similar-products-grid">
-                        <!-- Produtos similares serão carregados aqui via JS -->
                     </div>
                 </div>
             </div>
@@ -951,7 +1038,6 @@
                 <div class="mb-4">
                     <label class="form-label">Resumo do Pedido:</label>
                     <div id="checkoutItems" class="mb-3">
-                        <!-- Mini-cards serão inseridos aqui -->
                     </div>
                     <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
                     <div class="d-flex justify-content-between align-items-center">
@@ -1051,7 +1137,7 @@
     <div id="loginScreen" class="screen">
         <div style="max-width: 400px; margin: 0 auto;">
             <div class="product-details-container p-4">
-                <h3 class="text-center mb-4" style="color: var(--text-primary);">Login</h3>
+                <h3 class="text-center mb-4" style="color: var(--text-primary);">Entrar na sua conta</h3>
                 <form onsubmit="handleLogin(event)">
                     <div class="mb-3">
                         <label class="form-label">Email</label>
@@ -1065,6 +1151,51 @@
                         <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
                     </button>
                 </form>
+                <div class="text-center mt-3">
+                    <p style="color: var(--text-secondary);">Não tem uma conta?</p>
+                    <button class="btn-secondary-action w-100" onclick="showScreen('register')">
+                        <i class="bi bi-person-plus me-2"></i>Criar nova conta
+                    </button>
+                </div>
+                <button class="btn-back w-100 mt-3" onclick="showScreen('home')">
+                    <i class="bi bi-arrow-left"></i> Voltar para Loja
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER SCREEN -->
+    <div id="registerScreen" class="screen">
+        <div style="max-width: 400px; margin: 0 auto;">
+            <div class="product-details-container p-4">
+                <h3 class="text-center mb-4" style="color: var(--text-primary);">Criar nova conta</h3>
+                <form onsubmit="handleRegister(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Nome Completo</label>
+                        <input type="text" class="form-control" id="registerName" required placeholder="Seu nome completo">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="registerEmail" required placeholder="seu@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="registerPassword" required placeholder="Mínimo 6 caracteres" minlength="6">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar Senha</label>
+                        <input type="password" class="form-control" id="registerPasswordConfirm" required placeholder="Confirme sua senha" minlength="6">
+                    </div>
+                    <button type="submit" class="btn-buy-now w-100">
+                        <i class="bi bi-person-check me-2"></i>Criar Conta
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <p style="color: var(--text-secondary);">Já tem uma conta?</p>
+                    <button class="btn-secondary-action w-100" onclick="showScreen('login')">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                    </button>
+                </div>
                 <button class="btn-back w-100 mt-3" onclick="showScreen('home')">
                     <i class="bi bi-arrow-left"></i> Voltar para Loja
                 </button>
@@ -1199,6 +1330,9 @@
 
 </div>
 
+<!-- Social Proof Notifications Container -->
+<div class="social-proof-container" id="socialProofContainer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
@@ -1244,11 +1378,100 @@
         updateThemeUI(savedTheme);
     }
 
+    // Sistema de Social Proof (Notificações)
+    const socialProofNames = [
+        "João S.", "Maria L.", "Carlos A.", "Ana P.", "Pedro H.", "Julia M.",
+        "Ricardo F.", "Fernanda C.", "Lucas G.", "Beatriz R.", "Rafael N.", "Camila S."
+    ];
+
+    const socialProofActions = [
+        "acabou de comprar",
+        "está visualizando",
+        "adicionou ao carrinho",
+        "está interessado em",
+        "acabou de adquirir"
+    ];
+
+    const socialProofProducts = [
+        "Netflix Premium",
+        "Conta Spotify",
+        "Key Steam",
+        "Conta Discord Nitro",
+        "Conta Crunchyroll",
+        "Método de Pagamento"
+    ];
+
+    function startSocialProof() {
+        // Limpa qualquer intervalo anterior (caso a função seja chamada múltiplas vezes)
+        if (window.socialProofInterval) {
+            clearInterval(window.socialProofInterval);
+        }
+
+        // CORREÇÃO: Intervalo ajustado para 40-50 segundos (40000-50000ms)
+        // Cria uma nova notificação a cada 40-50 segundos
+        window.socialProofInterval = setInterval(() => {
+            createSocialProofNotification();
+        }, Math.random() * 10000 + 40000); // Entre 40 e 50 segundos
+
+        // Cria uma notificação inicial após 3 segundos
+        setTimeout(() => {
+            createSocialProofNotification();
+        }, 3000);
+    }
+
+    function createSocialProofNotification() {
+        const name = socialProofNames[Math.floor(Math.random() * socialProofNames.length)];
+        const action = socialProofActions[Math.floor(Math.random() * socialProofActions.length)];
+        const product = socialProofProducts[Math.floor(Math.random() * socialProofProducts.length)];
+        const time = Math.floor(Math.random() * 5) + 1; // 1 a 5 minutos atrás
+
+        const notification = document.createElement('div');
+        notification.className = 'social-proof-notification';
+        notification.onclick = () => notification.remove();
+
+        const icon = document.createElement('div');
+        icon.className = 'social-proof-icon';
+        icon.innerHTML = '<i class="bi bi-person-circle"></i>';
+
+        const content = document.createElement('div');
+        content.className = 'social-proof-content';
+
+        const nameElement = document.createElement('div');
+        nameElement.className = 'social-proof-name';
+        nameElement.textContent = name;
+
+        const actionElement = document.createElement('div');
+        actionElement.className = 'social-proof-action';
+        actionElement.textContent = `${action} ${product}`;
+
+        const timeElement = document.createElement('div');
+        timeElement.className = 'social-proof-time';
+        timeElement.textContent = `Há ${time} min`;
+
+        content.appendChild(nameElement);
+        content.appendChild(actionElement);
+        content.appendChild(timeElement);
+
+        notification.appendChild(icon);
+        notification.appendChild(content);
+
+        const container = document.getElementById('socialProofContainer');
+        container.appendChild(notification);
+
+        // Remove a notificação após a animação (5 segundos)
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
         checkAuth();
         loadProducts();
         updateCartUI();
+        startSocialProof();
     });
 
     async function checkAuth() {
@@ -1281,6 +1504,7 @@
     function updateAuthUI() {
         if (currentUser) {
             document.getElementById('loginNavBtn').classList.add('d-none');
+            document.getElementById('registerNavBtn').classList.add('d-none');
             document.getElementById('myOrdersNavBtn').classList.remove('d-none');
             document.getElementById('userNavInfo').classList.remove('d-none');
             document.getElementById('logoutNavBtn').classList.remove('d-none');
@@ -1310,11 +1534,44 @@
                 localStorage.setItem('authToken', authToken);
                 await checkAuth();
                 showScreen('home');
+                alert('Login realizado com sucesso!');
             } else {
                 alert('Email ou senha inválidos');
             }
         } catch (error) {
             alert('Erro ao fazer login');
+        }
+    }
+
+    async function handleRegister(e) {
+        e.preventDefault();
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+        if (password !== passwordConfirm) {
+            alert('As senhas não coincidem!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            if (response.ok) {
+                alert('Conta criada com sucesso! Faça login para continuar.');
+                showScreen('login');
+                document.getElementById('loginEmail').value = email;
+            } else {
+                const error = await response.text();
+                alert(error || 'Erro ao criar conta. Email pode já estar cadastrado.');
+            }
+        } catch (error) {
+            alert('Erro ao criar conta');
         }
     }
 
@@ -1567,7 +1824,6 @@
             const itemTotal = item.price * item.quantity;
             total += itemTotal;
 
-            // Mini-cards com imagem
             checkoutItems.innerHTML += `
                 <div class="checkout-product-card">
                     <img src="${item.image}" class="checkout-product-thumb" alt="${item.title}">
@@ -2018,6 +2274,7 @@
             'pixPayment': 'pixPaymentScreen',
             'myOrders': 'myOrdersScreen',
             'login': 'loginScreen',
+            'register': 'registerScreen',
             'adminProducts': 'adminProductsScreen',
             'adminProductForm': 'adminProductFormScreen',
             'adminSettings': 'adminSettingsScreen'
@@ -2039,6 +2296,5 @@
         window.scrollTo(0, 0);
     }
 </script>
-
 </body>
 </html>
