@@ -83,10 +83,10 @@ class PixPaymentIntegrationTest {
         assertNotNull(response.expiresAt());
         assertEquals(testOrder.getId(), response.orderId());
 
-        System.out.println("✅ Pagamento PIX criado com sucesso!");
-        System.out.println("📱 External ID: " + response.externalId());
-        System.out.println("💰 Valor: R$ " + response.amount());
-        System.out.println("📋 QR Code Texto: " + response.pixQrCodeText().substring(0, 50) + "...");
+        System.out.println("Pagamento PIX criado com sucesso!");
+        System.out.println("External ID: " + response.externalId());
+        System.out.println("Valor: R$ " + response.amount());
+        System.out.println("QR Code Texto: " + response.pixQrCodeText().substring(0, 50) + "...");
     }
 
     @Test
@@ -102,7 +102,7 @@ class PixPaymentIntegrationTest {
         assertEquals(created.paymentId(), status.paymentId());
         assertEquals(created.externalId(), status.externalId());
 
-        System.out.println("✅ Status consultado com sucesso!");
-        System.out.println("📊 Status atual: " + status.status());
+        System.out.println("Status consultado com sucesso!");
+        System.out.println("Status atual: " + status.status());
     }
 }
