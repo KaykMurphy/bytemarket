@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - ByteMarket</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="/" class="logo"><i class="fa-solid fa-gamepad"></i> Byte<span>Market Admin</span></a>
+        <div class="nav-actions">
+            <a href="/" class="btn-ghost">Voltar para a Loja</a>
+            <button onclick="logout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </div>
+</header>
+
+<main class="container admin-container">
+    <aside class="admin-sidebar">
+        <button class="tab-btn active" data-tab="products"><i class="fa-solid fa-box"></i> Produtos</button>
+        <button class="tab-btn" data-tab="stock"><i class="fa-solid fa-cubes"></i> Estoque</button>
+        <button class="tab-btn" data-tab="orders"><i class="fa-solid fa-receipt"></i> Pedidos</button>
+        <button class="tab-btn" data-tab="config"><i class="fa-solid fa-gear"></i> Configurações</button>
+    </aside>
+
+    <section class="admin-content" id="products-section">
+        <div class="header-actions">
+            <h2>Gerenciar Catálogo</h2>
+            <button class="btn-primary" onclick="openProductModal()">
+                <i class="fa-solid fa-plus"></i> Novo Produto
+            </button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="search-products" placeholder="Buscar produtos..." onkeyup="searchProducts()">
+            <i class="fa-solid fa-search"></i>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Tipo</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="admin-product-list">
+            </tbody>
+        </table>
+    </section>
+
+    <section class="admin-content hidden" id="stock-section">
+        <div class="header-actions">
+            <h2>Gerenciar Estoque</h2>
+            <button class="btn-primary" onclick="openBulkStockModal()">
+                <i class="fa-solid fa-boxes-packing"></i> Adicionar em Massa
+            </button>
+        </div>
+        <div id="stock-content">
+            <!-- Conteúdo dinâmico do estoque -->
+        </div>
+    </section>
+
+    <section class="admin-content hidden" id="orders-section">
+        <div class="header-actions">
+            <h2>Pedidos Recentes</h2>
+        </div>
+        <div id="orders-content">
+            <!-- Conteúdo dinâmico dos pedidos -->
+        </div>
+    </section>
+</main>
+
+<!-- Modal de Produto -->
+<div id="product-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Novo Produto</h3>
+            <button onclick="closeProductModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="product-form">
+            <input type="hidden" id="product-id">
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Título do Produto *</label>
+                    <input type="text" id="prod-title" required placeholder="Ex: Conta Netflix 4K">
+                </div>
+                <div class="input-group">
+                    <label>Tipo *</label>
+                    <select id="prod-type" required>
+                        <option value="">Selecione um tipo</option>
+                        <option value="STREAMING">Streaming</option>
+                        <option value="GAMES">Jogos</option>
+                        <option value="SOFTWARE">Software</option>
+                        <option value="METHODS">Métodos</option>
+                        <option value="AUTOMATIC_DELIVERY">Entrega Automática</option>
+                        <option value="ASSINATURAS">Assinaturas</option>
+                        <option value="KEYS">Chaves</option>
+                        <option value="DISCORD">Discord</option>
+                        <option value="CONTAS">Contas</option>
+                        <option value="UTILIDADES">Utilidades</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Preço (R$) *</label>
+                    <input type="number" step="0.01" id="prod-price" required placeholder="0.00" min="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Status</label>
+                    <select id="prod-status">
+                        <option value="ACTIVE">Ativo</option>
+                        <option value="INACTIVE">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>URL da Imagem *</label>
+                <input type="url" id="prod-image" required placeholder="https://...">
+                <small>Recomendado: 600x400px</small>
+            </div>
+
+            <div class="input-group">
+                <label>Descrição Detalhada *</label>
+                <textarea id="prod-desc" rows="6" required placeholder="Descreva detalhadamente o produto..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-ghost" onclick="closeProductModal()">Cancelar</button>
+                <button type="submit" class="btn-primary" id="submit-btn">Salvar Produto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Estoque -->
+<div id="stock-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="stock-modal-title">Gerenciar Estoque</h3>
+            <button onclick="closeStockModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="stock-product-id">
+
+            <div class="stock-info">
+                <h4 id="stock-product-name"></h4>
+                <div class="stock-stats">
+                    <div class="stat">
+                        <span class="stat-label">Disponível:</span>
+                        <span class="stat-value" id="stock-available">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Vendido:</span>
+                        <span class="stat-value" id="stock-sold">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Total:</span>
+                        <span class="stat-value" id="stock-total">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Adicionar Itens de Estoque</label>
+                <textarea id="stock-items" rows="4" placeholder="Insira um item por linha no formato: email:senha&#10;Exemplo: usuario@gmail.com:senha123"></textarea>
+                <small>Formato: email:senha (um por linha)</small>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-ghost" onclick="closeStockModal()">Cancelar</button>
+                <button type="button" class="btn-primary" onclick="addStockItems()">Adicionar Itens</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal-content small">
+        <div class="modal-header">
+            <h3 id="confirm-title">Confirmar Ação</h3>
+            <button onclick="closeConfirmModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <p id="confirm-message">Tem certeza que deseja realizar esta ação?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-ghost" onclick="closeConfirmModal()">Cancelar</button>
+            <button type="button" class="btn-danger" id="confirm-action-btn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

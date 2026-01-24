@@ -318,7 +318,7 @@ curl http://localhost:8080/products
 
 ```bash
 # Login
-heroku login
+heroku login.html
 
 # Criar app
 heroku create bytemarket-api

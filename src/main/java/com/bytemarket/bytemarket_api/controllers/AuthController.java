@@ -43,6 +43,6 @@ public class AuthController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail()));
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
     }
 }

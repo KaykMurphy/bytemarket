@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Produto - ByteMarket</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="/" class="logo">
+            <i class="fa-solid fa-gamepad"></i> Byte<span>Market</span>
+        </a>
+        <div class="nav-actions">
+            <a href="/" class="btn-ghost"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+            <a href="#" class="cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="container product-container">
+
+    <div class="product-gallery">
+        <div class="main-image-box">
+            <img id="product-img" src="" alt="Produto" class="main-img">
+        </div>
+    </div>
+
+    <div class="product-info">
+        <div class="product-header-info">
+            <span id="product-type" class="badge-type">Carregando...</span>
+            <span class="stock-status" id="stock-status">Verificando...</span>
+        </div>
+
+        <h1 id="product-title">Carregando título...</h1>
+
+        <div class="price-card">
+            <div class="price-row">
+                <span class="currency">R$</span>
+                <span id="product-price" class="value">0,00</span>
+            </div>
+
+            <div class="actions">
+                <div class="quantity-selector">
+                    <button onclick="updateQty(-1)">-</button>
+                    <input type="number" id="qty" value="1" min="1" readonly>
+                    <button onclick="updateQty(1)">+</button>
+                </div>
+                <button id="btn-buy" class="btn-primary btn-large" onclick="buyProduct()">
+                    <i class="fa-solid fa-cart-plus"></i> Comprar Agora
+                </button>
+            </div>
+            <p class="secure-info"><i class="fa-solid fa-lock"></i> Pagamento 100% seguro via PIX</p>
+        </div>
+
+    </div>
+
+    <div class="description-box">
+        <h3><i class="fa-solid fa-align-left"></i> Descrição do Produto</h3>
+        <div id="product-desc" class="desc-content">
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <div class="container footer-content">
+        <p>&copy; 2026 ByteMarket. Todos os direitos reservados.</p>
+    </div>
+</footer>
+
+<script src="/js/product.js"></script>
+</body>
+</html>

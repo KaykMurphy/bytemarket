@@ -11,6 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class ProductService {
@@ -30,6 +33,15 @@ public class ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + id));
 
         return mapToResponse(product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResponseDTO> searchByTitle(String query) {
+        List<Product> products = productRepository.findByTitleContainingIgnoreCase(query);
+
+        return products.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     private ProductResponseDTO mapToResponse(Product product) {

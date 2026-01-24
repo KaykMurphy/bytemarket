@@ -9,6 +9,7 @@ import com.mercadopago.client.payment.PaymentPayerRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,9 @@ public class PixPaymentService {
     @Value("${bytemarket.base-url}")
     private String baseUrl;
 
+    @Value("${spring.profiles.active:prod}")
+    private String activeProfile;
+
 
     @Transactional
     public PixPaymentResponseDTO createPixPayment(com.bytemarket.bytemarket_api.domain.Order order) {
@@ -46,7 +50,7 @@ public class PixPaymentService {
 
         } catch (MPApiException e) {
             log.error("Erro API Mercado Pago: {} - {}", e.getStatusCode(), e.getApiResponse().getContent());
-            // Mostra o erro real da API 
+            // Mostra o erro real da API
             throw new RuntimeException("Erro na API de Pagamento: " + e.getApiResponse().getContent());
 
         } catch (MPException e) {
@@ -145,21 +149,26 @@ public class PixPaymentService {
         );
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PixPaymentResponseDTO getPaymentStatus(Long paymentId) {
-        com.bytemarket.bytemarket_api.domain.Payment payment =
-                paymentRepository.findById(paymentId)
-                        .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
+        com.bytemarket.bytemarket_api.domain.Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new EntityNotFoundException("Pagamento não encontrado"));
+
+        // Se estiver em desenvolvimento e o pagamento já foi aprovado manualmente
+        if ("dev".equals(activeProfile) && payment.getStatus() == PaymentStatus.APPROVED) {
+            return mapToDTO(payment);
+        }
 
         try {
             PaymentClient client = new PaymentClient();
             Payment mpPayment = client.get(Long.parseLong(payment.getExternalId()));
 
             PaymentStatus newStatus = mapMercadoPagoStatus(mpPayment.getStatus());
+
             if (payment.getStatus() != newStatus) {
                 payment.setStatus(newStatus);
                 paymentRepository.save(payment);
-                log.info("Status do pagamento {} atualizado: {}", paymentId, newStatus);
+                log.info("Status do pagamento {} atualizado via API: {}", paymentId, newStatus);
             }
 
         } catch (Exception e) {

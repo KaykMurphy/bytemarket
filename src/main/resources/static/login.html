@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ByteMarket</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+<div class="auth-container">
+    <header class="auth-header">
+        <a href="/" class="logo"><i class="fa-solid fa-gamepad"></i> Byte<span>Market</span></a>
+    </header>
+
+    <main class="auth-card">
+        <div class="auth-content">
+            <h2>Acesse sua conta</h2>
+            <p class="subtitle">Bem-vindo de volta! Insira seus dados abaixo.</p>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+
+                <div class="input-group">
+                    <div class="label-wrapper">
+                        <label for="password">Senha</label>
+                        <a href="#" class="forgot-link">Esqueceu a senha?</a>
+                    </div>
+                    <input type="password" id="password" required placeholder="******">
+                </div>
+
+                <button type="submit" class="btn-primary btn-full" id="btn-login">
+                    Entrar na conta
+                </button>
+                <p id="error-msg" class="error-text"></p>
+            </form>
+
+            <div class="auth-footer">
+                Ainda não tem conta? <a href="/register.html">Crie uma agora</a>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="/js/login.js"></script>
+</body>
+</html>

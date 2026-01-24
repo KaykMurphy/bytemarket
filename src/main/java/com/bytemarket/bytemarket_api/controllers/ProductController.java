@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/products")
@@ -25,5 +27,10 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
         ProductResponseDTO result = productService.findById(id);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponseDTO>> searchProducts(@RequestParam String q) {
+        return ResponseEntity.ok(productService.searchByTitle(q));
     }
 }

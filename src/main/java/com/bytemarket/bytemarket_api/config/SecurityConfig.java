@@ -37,11 +37,30 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error", "/favicon.ico").permitAll()
+
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/", "/index", "/login", "/register").permitAll()
+
+                        .requestMatchers(
+                                "/",
+                                "/index",
+                                "/index.html",
+                                "/login",
+                                "/login.html",
+                                "/register",
+                                "/register.html",
+                                "/product.html",
+                                "/checkout.html",
+                                "/admin.html",
+                                //"/test/**",
+                                "/success.html"
+                        ).permitAll()
+
                         .requestMatchers("/auth/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+
                         .requestMatchers("/webhooks/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
