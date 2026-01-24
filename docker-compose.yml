@@ -23,6 +23,7 @@ services:
       - "8080:8080"
     depends_on:
       - bytemarket-db
+    restart: on-failure
     env_file:
       - .env
 
