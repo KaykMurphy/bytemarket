@@ -50,6 +50,8 @@ public class AdminProductService {
         if (dto.imageUrl() != null) product.setImageUrl(dto.imageUrl());
         if (dto.type() != null) product.setType(dto.type());
 
+        if (dto.active() != null) product.setActive(dto.active());
+
         Product updated = productRepository.save(product);
 
         return mapToResponse(updated);
@@ -57,10 +59,11 @@ public class AdminProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new EntityNotFoundException("Produto não encontrado: " + id);
-        }
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + id));
+
+        product.setActive(false);
+        productRepository.save(product);
     }
 
     @Transactional

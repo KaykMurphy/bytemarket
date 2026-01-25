@@ -72,7 +72,10 @@ public class OrderService {
                             product.getType() == ProductType.STREAMING ||
                             product.getType() == ProductType.DISCORD ||
                             product.getType() == ProductType.UTILIDADES ||
-                            product.getType() == ProductType.METODOS;
+                            product.getType() == ProductType.GAMES ||
+                            product.getType() == ProductType.SOFTWARE ||
+                            product.getType() == ProductType.METHODS;
+
 
             if (isAutomaticDelivery) {
                 stockValidator.validateAvailability(product, quantity);

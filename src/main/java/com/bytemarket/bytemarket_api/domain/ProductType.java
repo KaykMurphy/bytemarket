@@ -7,9 +7,10 @@ public enum ProductType {
     DISCORD,
     CONTAS,
     UTILIDADES,
-    METODOS,
     STREAMING,
-
+    SOFTWARE,
+    GAMES,
+    METHODS,
 
     AUTOMATIC_DELIVERY,
     SERVICE,

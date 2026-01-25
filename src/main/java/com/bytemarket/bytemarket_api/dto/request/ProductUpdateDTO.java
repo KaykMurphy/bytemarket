@@ -19,5 +19,7 @@ public record ProductUpdateDTO(
 
         String imageUrl,
 
-        ProductType type
+        ProductType type,
+
+        Boolean active
 ) {}

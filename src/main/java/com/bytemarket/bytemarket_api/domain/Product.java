@@ -42,5 +42,7 @@ public class Product { //A vitrine (o que o usuário vê)
     @OneToMany(mappedBy = "product")
     private List<StockItem> stockItems = new ArrayList<>();
 
+    private Boolean active = true;
+
 }
 

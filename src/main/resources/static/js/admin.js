@@ -244,7 +244,9 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
         description: document.getElementById('prod-desc').value,
         price: parseFloat(document.getElementById('prod-price').value),
         imageUrl: document.getElementById('prod-image').value,
-        type: document.getElementById('prod-type').value
+        type: document.getElementById('prod-type').value,
+
+        active: document.getElementById('prod-status') ? document.getElementById('prod-status').value === 'true' : true
     };
 
     if (isEdit) {

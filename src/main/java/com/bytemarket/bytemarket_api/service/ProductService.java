@@ -23,7 +23,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDTO> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable)
+        return productRepository.findByActiveTrue(pageable)
                 .map(this::mapToResponse);
     }
 
@@ -31,6 +31,10 @@ public class ProductService {
     public ProductResponseDTO findById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado: " + id));
+
+        if (!Boolean.TRUE.equals(product.getActive())) {
+            throw new EntityNotFoundException("Este produto foi removido ou está indisponível.");
+        }
 
         return mapToResponse(product);
     }
@@ -40,6 +44,7 @@ public class ProductService {
         List<Product> products = productRepository.findByTitleContainingIgnoreCase(query);
 
         return products.stream()
+                .filter(p -> Boolean.TRUE.equals(p.getActive()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
