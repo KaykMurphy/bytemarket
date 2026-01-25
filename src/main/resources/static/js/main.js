@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080';
+const API_URL = window.location.origin;
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
