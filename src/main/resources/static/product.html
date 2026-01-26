@@ -21,9 +21,15 @@
         </a>
         <div class="nav-actions">
             <a href="/" class="btn-ghost"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
-            <a href="#" class="cart-btn">
+
+            <button class="theme-toggle" id="theme-toggle" onclick="if(typeof toggleTheme === 'function') toggleTheme()">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+
+            <button class="cart-btn" onclick="window.location.href='/'">
                 <i class="fa-solid fa-cart-shopping"></i>
-            </a>
+                <span class="cart-count">0</span>
+            </button>
         </div>
     </div>
 </header>
@@ -44,6 +50,38 @@
 
         <h1 id="product-title">Carregando título...</h1>
 
+        <div class="product-features">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="feature-info">
+                    <h4>Entrega Instantânea</h4>
+                    <p>Receba o produto automaticamente por email</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="feature-info">
+                    <h4>Compra Segura</h4>
+                    <p>Pagamento 100% protegido via PIX</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div class="feature-info">
+                    <h4>Suporte 24/7</h4>
+                    <p>Equipe pronta para ajudar quando precisar</p>
+                </div>
+            </div>
+        </div>
+
         <div class="price-card">
             <div class="price-row">
                 <span class="currency">R$</span>
@@ -56,18 +94,41 @@
                     <input type="number" id="qty" value="1" min="1" readonly>
                     <button onclick="updateQty(1)">+</button>
                 </div>
+
+                <button id="btn-add-cart" class="btn-primary btn-large btn-add-cart" onclick="addProductToCart()">
+                    <i class="fa-solid fa-cart-plus"></i> Adicionar
+                </button>
+
                 <button id="btn-buy" class="btn-primary btn-large" onclick="buyProduct()">
-                    <i class="fa-solid fa-cart-plus"></i> Comprar Agora
+                    <i class="fa-solid fa-bolt"></i> Comprar
                 </button>
             </div>
-            <p class="secure-info"><i class="fa-solid fa-lock"></i> Pagamento 100% seguro via PIX</p>
+
+            <p class="secure-info">
+                <i class="fa-solid fa-lock"></i> Pagamento 100% seguro via PIX
+            </p>
         </div>
 
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <i class="fa-solid fa-check-circle"></i>
+                <p>Produto Verificado</p>
+            </div>
+            <div class="trust-badge">
+                <i class="fa-solid fa-rotate"></i>
+                <p>Garantia de 30 dias</p>
+            </div>
+            <div class="trust-badge">
+                <i class="fa-brands fa-pix"></i>
+                <p>Pague com PIX</p>
+            </div>
+        </div>
     </div>
 
     <div class="description-box">
         <h3><i class="fa-solid fa-align-left"></i> Descrição do Produto</h3>
         <div id="product-desc" class="desc-content">
+            <p>Carregando descrição...</p>
         </div>
     </div>
 
@@ -76,9 +137,15 @@
 <footer>
     <div class="container footer-content">
         <p>&copy; 2026 ByteMarket. Todos os direitos reservados.</p>
+        <div class="socials">
+            <a href="#"><i class="fa-brands fa-discord"></i></a>
+            <a href="#"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        </div>
     </div>
 </footer>
 
+<script src="/js/main.js"></script>
 <script src="/js/product.js"></script>
 </body>
 </html>

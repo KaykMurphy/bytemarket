@@ -8,27 +8,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <header class="navbar">
     <div class="container navbar-content">
-        <div class="logo">
+        <a href="/" class="logo">
             <i class="fa-solid fa-gamepad"></i> Byte<span>Market</span>
-        </div>
+        </a>
 
         <div class="search-bar">
-            <div class="input-wrapper">
+            <div class="search-bar-wrapper">
                 <input type="text" id="search-input" placeholder="O que você procura hoje?" autocomplete="off">
-                <div id="search-results" class="search-dropdown hidden"></div> </div>
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+                <button><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <div class="search-dropdown"></div>
         </div>
 
         <div class="nav-actions">
+            <a href="#" id="discord-btn" class="discord-btn" style="display: none;" target="_blank">
+                <i class="fa-brands fa-discord"></i>
+                <span>Discord</span>
+            </a>
+
+            <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+                <i class="fa-solid fa-sun"></i>
+                <span>Claro</span>
+            </button>
+
             <div id="guest-actions" class="nav-user-group">
                 <a href="/login.html" class="btn-ghost">Login</a>
                 <a href="/register.html" class="btn-primary">Criar Conta</a>
@@ -39,20 +48,45 @@
                     <i class="fa-solid fa-circle-user user-icon"></i>
                     <span id="user-name-display">Carregando...</span>
                     <div class="user-dropdown">
-                        <a href="/admin.html" id="admin-link" class="hidden" style="color: var(--primary); font-weight: bold; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 5px;">
+                        <a href="/admin.html" id="admin-link" class="hidden">
                             <i class="fa-solid fa-lock"></i> Painel Admin
                         </a>
-
                         <a href="#"><i class="fa-solid fa-box"></i> Meus Pedidos</a>
                         <button onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
                     </div>
                 </div>
             </div>
 
-            <a href="#" class="cart-btn">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="cart-count">0</span>
-            </a>
+            <div style="position: relative;">
+                <button class="cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </button>
+
+                <div class="cart-dropdown">
+                    <div class="cart-header">
+                        <span>Meu Carrinho</span>
+                        <span class="cart-count">0</span>
+                    </div>
+
+                    <div class="cart-items"></div>
+
+                    <div class="cart-empty">
+                        <i class="fa-solid fa-cart-shopping" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 10px;"></i>
+                        <p>Seu carrinho está vazio</p>
+                    </div>
+
+                    <div class="cart-footer" style="display: none;">
+                        <div class="cart-total">
+                            <span>Total:</span>
+                            <span>R$ 0,00</span>
+                        </div>
+                        <button class="cart-checkout-btn" onclick="goToCheckout()">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </header>
@@ -100,9 +134,9 @@
     <div class="container footer-content">
         <p>&copy; 2026 ByteMarket. Todos os direitos reservados.</p>
         <div class="socials">
-            <i class="fa-brands fa-discord"></i>
-            <i class="fa-brands fa-twitter"></i>
-            <i class="fa-brands fa-instagram"></i>
+            <a href="#"><i class="fa-brands fa-discord"></i></a>
+            <a href="#"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
         </div>
     </div>
 </footer>
