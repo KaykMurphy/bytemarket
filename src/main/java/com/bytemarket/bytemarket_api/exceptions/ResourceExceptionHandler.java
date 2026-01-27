@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -154,6 +156,21 @@ public class ResourceExceptionHandler {
                 request.getRequestURI()
         );
 
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class, InternalAuthenticationServiceException.class})
+    public ResponseEntity<StandardError> authenticationError(Exception e, HttpServletRequest request) {
+        String error = "Erro de Autenticação";
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        StandardError err = new StandardError(
+                java.time.Instant.now(),
+                status.value(),
+                error,
+                "Usuário ou senha inválidos",
+                request.getRequestURI()
+        );
         return ResponseEntity.status(status).body(err);
     }
 }
