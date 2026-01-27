@@ -2,7 +2,6 @@ const API_URL = window.location.origin;
 
 document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const btn = document.getElementById('btn-register');
     const errorMsg = document.getElementById('error-msg');
     const name = document.getElementById('name').value;
@@ -20,8 +19,17 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
             body: JSON.stringify({ name, email, password })
         });
 
+        // Tratar rate limiting no registro
+        if (regRes.status === 429) {
+            errorMsg.innerText = '⚠️ Limite de requisições excedido. Aguarde e tente novamente.';
+            btn.disabled = false;
+            btn.innerText = 'Finalizar cadastro';
+            return;
+        }
+
         if (!regRes.ok) {
             if (regRes.status === 409) throw new Error('Este e-mail já está em uso.');
+            if (regRes.status === 422) throw new Error('Dados inválidos. Verifique os campos.');
             throw new Error('Erro ao criar conta. Tente novamente.');
         }
 
@@ -32,10 +40,18 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
             body: JSON.stringify({ email, password })
         });
 
+        // Tratar rate limiting no login automático
+        if (loginRes.status === 429) {
+            errorMsg.innerText = '⚠️ Limite de tentativas excedido. Faça login manualmente.';
+            btn.disabled = false;
+            btn.innerText = 'Finalizar cadastro';
+            return;
+        }
+
         const data = await loginRes.json();
         localStorage.setItem('token', data.token);
-
         window.location.href = '/';
+
     } catch (error) {
         errorMsg.innerText = error.message;
         btn.disabled = false;

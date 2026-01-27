@@ -1,10 +1,10 @@
+// ===== CONFIGURAÇÃO DA API =====
 window.API_URL =
     window.location.origin === 'null'
         ? 'http://localhost:8080'
         : window.location.origin;
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
 const currentTheme = localStorage.getItem('theme') || 'dark';
 
 // Aplicar tema inicial
@@ -17,17 +17,14 @@ function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = html.getAttribute('data-theme');
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
     html.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
-
     updateThemeIcon(newTheme);
 }
 
 function updateThemeIcon(theme) {
     const icon = document.querySelector('#theme-toggle i');
     const text = document.querySelector('#theme-toggle span');
-
     if (icon) {
         if (theme === 'light') {
             icon.className = 'fa-solid fa-moon';
@@ -44,11 +41,9 @@ async function loadDiscordLink() {
     try {
         const token = localStorage.getItem('token');
         if (!token) return;
-
         const response = await fetch(`${window.API_URL}/admin/settings/discord`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-
         if (response.ok) {
             const discordLink = await response.text();
             const discordBtn = document.getElementById('discord-btn');
@@ -71,12 +66,10 @@ if (searchInput && searchDropdown) {
     searchInput.addEventListener('input', () => {
         clearTimeout(searchTimeout);
         const query = searchInput.value.trim();
-
         if (query.length < 2) {
             searchDropdown.classList.remove('active');
             return;
         }
-
         searchTimeout = setTimeout(() => performLiveSearch(query), 300);
     });
 
@@ -90,9 +83,8 @@ if (searchInput && searchDropdown) {
 
 async function performLiveSearch(query) {
     try {
-        const response = await fetch(`${window.API_URL}/products/search?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`${window.API_URL}/api/products/search?q=${encodeURIComponent(query)}`);
         const products = await response.json();
-
         displaySearchResults(products);
     } catch (error) {
         console.error('Erro na busca:', error);
@@ -101,7 +93,6 @@ async function performLiveSearch(query) {
 
 function displaySearchResults(products) {
     const searchDropdown = document.querySelector('.search-dropdown');
-
     if (!products || products.length === 0) {
         searchDropdown.innerHTML = `
             <div class="search-no-results">
@@ -125,7 +116,6 @@ function displaySearchResults(products) {
             </div>
         </div>
     `).join('');
-
     searchDropdown.classList.add('active');
 }
 
@@ -149,7 +139,6 @@ function updateCartUI() {
         } else {
             if (cartEmpty) cartEmpty.style.display = 'none';
             if (cartFooter) cartFooter.style.display = 'block';
-
             cartItems.innerHTML = cart.map(item => `
                 <div class="cart-item">
                     <img src="${item.imageUrl}" alt="${item.title}" class="cart-item-img">
@@ -162,7 +151,6 @@ function updateCartUI() {
                     </button>
                 </div>
             `).join('');
-
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             if (cartTotal) {
                 cartTotal.textContent = formatCurrency(total);
@@ -173,7 +161,6 @@ function updateCartUI() {
 
 function addToCart(product, quantity = 1) {
     const existingItem = cart.find(item => item.id === product.id);
-
     if (existingItem) {
         existingItem.quantity += quantity;
     } else {
@@ -185,10 +172,8 @@ function addToCart(product, quantity = 1) {
             quantity: quantity
         });
     }
-
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
-
     showNotification('Produto adicionado ao carrinho!', 'success');
 }
 
@@ -210,7 +195,6 @@ function goToCheckout() {
         showNotification('Seu carrinho está vazio!', 'warning');
         return;
     }
-
     const firstItem = cart[0];
     window.location.href = `/checkout.html?productId=${firstItem.id}&qty=${firstItem.quantity}`;
 }
@@ -218,7 +202,6 @@ function goToCheckout() {
 // Toggle Cart Dropdown
 const cartBtn = document.querySelector('.cart-btn');
 const cartDropdown = document.querySelector('.cart-dropdown');
-
 if (cartBtn && cartDropdown) {
     cartBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -247,7 +230,6 @@ function showNotification(message, type = 'info') {
         <i class="fa-solid fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
         <span>${message}</span>
     `;
-
     notification.style.cssText = `
         position: fixed;
         top: 80px;
@@ -265,9 +247,7 @@ function showNotification(message, type = 'info') {
         animation: slideInRight 0.3s ease;
         max-width: 300px;
     `;
-
     document.body.appendChild(notification);
-
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);
@@ -292,7 +272,6 @@ const createProductCard = (product) => {
     const imageSrc = product.imageUrl && product.imageUrl.startsWith('http')
         ? product.imageUrl
         : 'https://placehold.co/600x400/202024/8257e5?text=Sem+Imagem';
-
     const hasStock = product.availableStock > 0;
     const stockHtml = hasStock
         ? `<div class="stock-badge"><i class="fa-solid fa-circle" style="color: var(--green)"></i> <span>${product.availableStock} un</span></div>`
@@ -304,7 +283,6 @@ const createProductCard = (product) => {
             <div class="card-body">
                 <span class="card-tag">${product.type}</span>
                 <h3 class="card-title">${product.title}</h3>
-                
                 <div class="card-footer">
                     <span class="price">${formatCurrency(product.price)}</span>
                     ${stockHtml}
@@ -319,10 +297,9 @@ async function fetchProducts(searchTerm = '') {
     if (!container) return;
 
     try {
-        let url = `${window.API_URL}/products`;
-
+        let url = `${window.API_URL}/api/products`;
         if (searchTerm && searchTerm.trim() !== '') {
-            url = `${window.API_URL}/products/search?q=${encodeURIComponent(searchTerm)}`;
+            url = `${window.API_URL}/api/products/search?q=${encodeURIComponent(searchTerm)}`;
         }
 
         const response = await fetch(url);
@@ -380,18 +357,14 @@ async function checkAuth() {
 
         if (response.ok) {
             const user = await response.json();
-
             if (guestActions) guestActions.classList.add('hidden');
             if (userActions) userActions.classList.remove('hidden');
-
             if (nameDisplay) {
                 nameDisplay.innerText = user.name.split(' ')[0];
             }
-
             if (user.role === 'ADMIN' && adminLink) {
                 adminLink.classList.remove('hidden');
             }
-
         } else {
             localStorage.removeItem('token');
             if (guestActions) guestActions.classList.remove('hidden');
@@ -470,13 +443,10 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     updateCartUI();
     loadDiscordLink();
-
     updateThemeIcon(currentTheme);
-
     setTimeout(() => {
         setupDropdownBehavior();
     }, 500);
-
     document.body.classList.add('js-loaded');
 });
 

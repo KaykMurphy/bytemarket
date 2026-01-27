@@ -63,9 +63,9 @@ function closeConfirmModal() {
 // Carregar produtos
 async function fetchAdminProducts(searchTerm = '') {
     try {
-        let url = `${API_URL}/products?size=100`;
+        let url = `${API_URL}/api/products?size=100`; // ✅ CORRIGIDO: /api/products
         if (searchTerm) {
-            url = `${API_URL}/products/search?q=${encodeURIComponent(searchTerm)}`;
+            url = `${API_URL}/api/products/search?q=${encodeURIComponent(searchTerm)}`; // ✅ CORRIGIDO: /api/products/search
         }
 
         const res = await fetch(url);
@@ -85,7 +85,7 @@ async function fetchAdminProducts(searchTerm = '') {
                     <td><span class="stock-count">${p.availableStock || 0}</span></td>
                     <td><span class="type-tag">${p.type || 'N/A'}</span></td>
                     <td>
-                        <button class="btn-stock" onclick="openStockModal(${p.id}, '${p.title.replace(/'/g, "\\'")}')" 
+                        <button class="btn-stock" onclick="openStockModal(${p.id}, '${p.title.replace(/'/g, "\\'")}')"
                                 title="Gerenciar Estoque">
                             <i class="fa-solid fa-boxes-stacked"></i>
                         </button>
@@ -127,7 +127,7 @@ function searchProducts() {
 
 async function loadProductForEdit(productId) {
     try {
-        const res = await fetch(`${API_URL}/products/${productId}`);
+        const res = await fetch(`${API_URL}/api/products/${productId}`); // ✅ CORRIGIDO: /api/products
         const product = await res.json();
 
         document.getElementById('product-id').value = product.id;
@@ -245,10 +245,12 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
         price: parseFloat(document.getElementById('prod-price').value),
         imageUrl: document.getElementById('prod-image').value,
         type: document.getElementById('prod-type').value,
-
-        active: document.getElementById('prod-status') ? document.getElementById('prod-status').value === 'true' : true
+        active: document.getElementById('prod-status')
+            ? document.getElementById('prod-status').value === 'ACTIVE'
+            : true
     };
 
+    // Remover campos vazios no modo edição
     if (isEdit) {
         Object.keys(payload).forEach(key => {
             if (!payload[key] && payload[key] !== 0) {
@@ -362,13 +364,11 @@ async function checkAdminRole() {
 
         if (response.ok) {
             const user = await response.json();
-
             if (user.role !== 'ADMIN') {
                 alert('Acesso restrito a administradores!');
                 window.location.href = '/';
                 return;
             }
-
             console.log('Usuário admin autenticado:', user.name);
         } else {
             localStorage.removeItem('token');
@@ -388,7 +388,6 @@ window.logout = () => {
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAdminRole();
-
     await fetchAdminProducts();
 
     document.getElementById('search-products').addEventListener('input', (e) => {

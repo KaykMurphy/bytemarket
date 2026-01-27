@@ -130,7 +130,6 @@ async function processFinalPurchase(userId, deliveryEmail, token) {
     }
 }
 
-
 function startPaymentPolling(paymentId, token) {
     if (paymentCheckInterval) clearInterval(paymentCheckInterval);
 
@@ -157,13 +156,17 @@ function startPaymentPolling(paymentId, token) {
     }, 3000); // Tenta a cada 3 segundos
 }
 
-
 async function registerOrLogin(name, email, password) {
     const regRes = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
     });
+
+    // Tratar rate limiting no registro
+    if (regRes.status === 429) {
+        throw new Error('Limite de requisições excedido. Aguarde e tente novamente.');
+    }
 
     if (!regRes.ok && regRes.status !== 409) throw new Error('Erro ao criar conta.');
 
@@ -172,6 +175,11 @@ async function registerOrLogin(name, email, password) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
     });
+
+    // Tratar rate limiting no login
+    if (loginRes.status === 429) {
+        throw new Error('Limite de tentativas de login excedido. Aguarde alguns segundos.');
+    }
 
     if (!loginRes.ok) throw new Error('E-mail já existe ou senha incorreta.');
 
@@ -195,6 +203,11 @@ async function createOrder(userId, deliveryEmail, token) {
         body: JSON.stringify(payload)
     });
 
+    // Tratar rate limiting na criação de pedido
+    if (res.status === 429) {
+        throw new Error('Muitas tentativas de pedido. Aguarde 1 minuto antes de tentar novamente.');
+    }
+
     if (!res.ok) throw new Error('Falha ao criar pedido.');
     const order = await res.json();
     return order.id;
@@ -205,6 +218,11 @@ async function generatePix(orderId, token) {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    // Tratar rate limiting na geração de PIX
+    if (res.status === 429) {
+        throw new Error('Limite de geração de pagamentos atingido. Tente novamente em 1 minuto.');
+    }
 
     if (!res.ok) throw new Error('Falha ao gerar PIX.');
     return await res.json();

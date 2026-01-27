@@ -25,16 +25,13 @@ window.updateQty = (change) => {
         console.error('Input de quantidade não encontrado!');
         return;
     }
-
     let newValue = parseInt(input.value) + change;
     if (newValue < 1) newValue = 1;
-
     const product = window.currentProduct;
     if (product && newValue > product.availableStock) {
         newValue = product.availableStock;
         console.log('Quantidade limitada ao estoque:', newValue);
     }
-
     input.value = newValue;
     console.log('Nova quantidade:', newValue);
 };
@@ -42,9 +39,7 @@ window.updateQty = (change) => {
 // FUNÇÃO PRINCIPAL - CARREGAR PRODUTO
 async function loadProductDetails() {
     console.log('Iniciando carregamento do produto...');
-
     const id = getProductIdFromUrl();
-
     if (!id) {
         console.error('ID do produto não encontrado na URL!');
         alert('Produto não especificado.');
@@ -53,11 +48,10 @@ async function loadProductDetails() {
     }
 
     console.log('ID válido:', id);
-    console.log('Fazendo requisição para:', `${window.API_URL}/products/${id}`);
+    console.log('Fazendo requisição para:', `${window.API_URL}/api/products/${id}`);
 
     try {
-        const response = await fetch(`${window.API_URL}/products/${id}`);
-
+        const response = await fetch(`${window.API_URL}/api/products/${id}`); // ✅ CORRIGIDO: /api/products
         console.log('Resposta recebida!');
         console.log('Status:', response.status);
         console.log('OK:', response.ok);
@@ -77,16 +71,13 @@ async function loadProductDetails() {
             const imageUrl = product.imageUrl && product.imageUrl.startsWith('http')
                 ? product.imageUrl
                 : 'https://placehold.co/600x400/8257e5/ffffff?text=' + encodeURIComponent(product.title || 'Produto');
-
             console.log('URL da imagem:', imageUrl);
             img.src = imageUrl;
             img.alt = product.title || 'Produto';
-
             img.onerror = function() {
                 console.warn('Erro ao carregar imagem, usando placeholder');
                 this.src = 'https://placehold.co/600x400/8257e5/ffffff?text=Sem+Imagem';
             };
-
             img.onload = function() {
                 console.log('Imagem carregada com sucesso!');
             };
@@ -144,7 +135,6 @@ async function loadProductDetails() {
         // ATUALIZAR ESTOQUE E BOTÕES
         console.log('Atualizando status de estoque...');
         console.log('Estoque disponível:', product.availableStock);
-
         const stockEl = document.getElementById('stock-status');
         const btnBuy = document.getElementById('btn-buy');
         const btnAddCart = document.getElementById('btn-add-cart');
@@ -152,20 +142,17 @@ async function loadProductDetails() {
 
         if (product.availableStock > 0) {
             console.log('Produto EM ESTOQUE');
-
             // Atualizar badge de estoque
             if (stockEl) {
                 stockEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> Disponível (${product.availableStock} un)`;
                 stockEl.className = 'stock-status in-stock';
             }
-
             // Habilitar input de quantidade
             if (qtyInput) {
                 qtyInput.max = product.availableStock;
                 qtyInput.disabled = false;
                 qtyInput.value = 1;
             }
-
             // Habilitar botão COMPRAR
             if (btnBuy) {
                 btnBuy.disabled = false;
@@ -173,23 +160,19 @@ async function loadProductDetails() {
                 btnBuy.style.cursor = 'pointer';
                 btnBuy.innerHTML = '<i class="fa-solid fa-bolt"></i> Comprar Agora';
             }
-
             // Habilitar botão ADICIONAR AO CARRINHO
             if (btnAddCart) {
                 btnAddCart.disabled = false;
                 btnAddCart.style.opacity = '1';
                 btnAddCart.style.cursor = 'pointer';
             }
-
         } else {
             console.log('Produto ESGOTADO');
-
             // Atualizar badge de estoque
             if (stockEl) {
                 stockEl.innerHTML = `<i class="fa-solid fa-times-circle"></i> Esgotado`;
                 stockEl.className = 'stock-status out-stock';
             }
-
             // Desabilitar botões
             if (btnBuy) {
                 btnBuy.disabled = true;
@@ -197,13 +180,11 @@ async function loadProductDetails() {
                 btnBuy.style.cursor = 'not-allowed';
                 btnBuy.innerHTML = '<i class="fa-solid fa-ban"></i> Indisponível';
             }
-
             if (btnAddCart) {
                 btnAddCart.disabled = true;
                 btnAddCart.style.opacity = '0.5';
                 btnAddCart.style.cursor = 'not-allowed';
             }
-
             if (qtyInput) {
                 qtyInput.disabled = true;
             }
@@ -212,7 +193,6 @@ async function loadProductDetails() {
         // Salvar produto globalmente
         window.currentProduct = product;
         console.log('Produto salvo em window.currentProduct');
-
         console.log('PRODUTO CARREGADO COM SUCESSO!');
 
     } catch (error) {
@@ -243,7 +223,6 @@ async function loadProductDetails() {
 // FUNÇÃO: COMPRAR PRODUTO
 window.buyProduct = () => {
     console.log('Botão COMPRAR clicado!');
-
     const product = window.currentProduct;
     if (!product) {
         console.error('Produto não carregado!');
@@ -253,17 +232,14 @@ window.buyProduct = () => {
 
     const qtyInput = document.getElementById('qty');
     const qty = qtyInput ? qtyInput.value : 1;
-
     console.log('Quantidade:', qty);
     console.log('Redirecionando para checkout...');
-
     window.location.href = `/checkout.html?productId=${product.id}&qty=${qty}`;
 };
 
 // FUNÇÃO: ADICIONAR AO CARRINHO
 window.addProductToCart = () => {
     console.log('Botão ADICIONAR AO CARRINHO clicado!');
-
     const product = window.currentProduct;
     if (!product) {
         console.error('Produto não carregado!');
@@ -273,7 +249,6 @@ window.addProductToCart = () => {
 
     const qtyInput = document.getElementById('qty');
     const qty = qtyInput ? parseInt(qtyInput.value) : 1;
-
     console.log('Adicionando ao carrinho:', {
         produto: product.title,
         quantidade: qty,
@@ -288,13 +263,11 @@ window.addProductToCart = () => {
     }
 
     console.log('Função addToCart não encontrada, usando fallback');
-
     // Fallback: adicionar manualmente
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     console.log('Carrinho atual:', cart);
 
     const existingItem = cart.find(item => item.id === product.id);
-
     if (existingItem) {
         existingItem.quantity += qty;
         console.log('Item já existia, quantidade atualizada');
@@ -330,7 +303,6 @@ window.addProductToCart = () => {
 // FUNÇÃO: MOSTRAR NOTIFICAÇÃO
 function showSimpleNotification(message) {
     console.log('Mostrando notificação:', message);
-
     // Remover notificação anterior
     const oldNotification = document.querySelector('.simple-notification');
     if (oldNotification) {
@@ -343,7 +315,6 @@ function showSimpleNotification(message) {
         <i class="fa-solid fa-check-circle"></i>
         <span>${message}</span>
     `;
-
     notification.style.cssText = `
         position: fixed;
         top: 80px;
@@ -361,9 +332,7 @@ function showSimpleNotification(message) {
         animation: slideInRight 0.3s ease;
         max-width: 300px;
     `;
-
     document.body.appendChild(notification);
-
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);
@@ -391,9 +360,9 @@ if (!document.getElementById('notification-styles')) {
     document.head.appendChild(style);
 }
 
+
 // INICIALIZAÇÃO
 console.log('Aguardando DOM carregar...');
-
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM carregado!');
