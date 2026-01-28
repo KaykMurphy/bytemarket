@@ -22,6 +22,7 @@
 - [Executando](#-executando)
 - [Documentação da API](#-documentação-da-api)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Rate Limiting](#-rate-limiting)
 - [Fluxo de Pagamento PIX](#-fluxo-de-pagamento-pix)
 - [Segurança](#-segurança)
 - [Deploy](#-deploy)
@@ -40,6 +41,7 @@ ByteMarket é uma **API REST robusta e escalável** desenvolvida para marketplac
 📧 **Entrega automática** de produtos via email após confirmação de pagamento  
 🔔 **Sistema de webhooks** com validação HMAC para segurança  
 📦 **Gestão inteligente de estoque** com controle de concorrência (Optimistic Locking)  
+🛡️ **Rate Limiting avançado** com Bucket4j para proteção contra abuso  
 🔐 **Segurança em múltiplas camadas** (BCrypt, JWT, validação de entrada)  
 📚 **Documentação interativa** com Swagger/OpenAPI  
 
@@ -66,6 +68,7 @@ ByteMarket é uma **API REST robusta e escalável** desenvolvida para marketplac
 - 🔄 Atualização de estoque em tempo real com Optimistic Locking
 - 📧 Envio de emails transacionais com templates Thymeleaf
 - ✅ Validação de assinatura HMAC SHA-256 para webhooks
+- 🛡️ Proteção automática contra DDoS e brute force com rate limiting
 
 ---
 
@@ -86,6 +89,12 @@ ByteMarket é uma **API REST robusta e escalável** desenvolvida para marketplac
 ### Segurança & Autenticação
 - **JJWT 0.12.5** - Geração e validação de tokens JWT
 - **BCrypt** - Criptografia de senhas
+
+### Rate Limiting & Cache
+- **Bucket4j 0.12.9** - Token bucket algorithm para rate limiting
+- **Spring Cache** - Abstração de cache
+- **Caffeine Cache** - Engine de cache de alta performance em memória
+- **JCache (JSR-107)** - API padrão para integração
 
 ### Pagamentos
 - **Mercado Pago SDK 2.1.28** - Integração com gateway de pagamento
@@ -239,22 +248,22 @@ GET    /auth/me           # Obter dados do usuário logado
 
 #### 📦 Produtos (Público)
 ```http
-GET    /products          # Listar produtos (paginado)
-GET    /products/{id}     # Detalhes de um produto
-GET    /products/search   # Buscar produtos por título
+GET    /api/products          # Listar produtos (paginado)
+GET    /api/products/{id}     # Detalhes de um produto
+GET    /api/products/search   # Buscar produtos por título
 ```
 
 #### 🛒 Pedidos (Autenticado)
 ```http
-POST   /orders                      # Criar novo pedido
-GET    /users/{userId}/orders       # Histórico de pedidos
-GET    /users/{userId}/orders/{id}  # Detalhes de um pedido
+POST   /api/orders                      # Criar novo pedido
+GET    /api/users/{userId}/orders       # Histórico de pedidos
+GET    /api/users/{userId}/orders/{id}  # Detalhes de um pedido
 ```
 
 #### 💳 Pagamentos (Autenticado)
 ```http
-POST   /payments/pix/orders/{orderId}  # Gerar pagamento PIX
-GET    /payments/{paymentId}            # Consultar status do pagamento
+POST   /api/payments/pix/orders/{orderId}  # Gerar pagamento PIX
+GET    /api/payments/{paymentId}            # Consultar status do pagamento
 ```
 
 #### 🔧 Admin (ROLE_ADMIN)
@@ -279,11 +288,12 @@ POST   /webhooks/payment  # Receber notificações de pagamento
 bytemarket-api/
 │
 ├── src/main/java/com/bytemarket/bytemarket_api/
-│   ├── config/                 # Configurações (Security, Email, MP, Swagger)
-│   │   ├── AdminSeeder.java
-│   │   ├── EmailConfig.java
+│   ├── config/                 # Configurações
+│   │   ├── AdminSeeder.java            # Criação automática de admin
+│   │   ├── CacheConfig.java            # Configuração de cache (Caffeine)
+│   │   ├── EmailConfig.java            # Configuração de email
 │   │   ├── MercadoPagoConfiguration.java
-│   │   └── SecurityConfig.java
+│   │   └── SecurityConfig.java         # Spring Security + JWT
 │   │
 │   ├── controllers/            # Controllers REST
 │   │   ├── AuthController.java
@@ -340,8 +350,8 @@ bytemarket-api/
 ├── src/main/resources/
 │   ├── templates/email/        # Templates Thymeleaf
 │   │   └── order-confirmation.html
-│   ├── static/                 # Arquivos estáticos do frontend
-│   └── application.properties
+│   ├── static/                 # Frontend (HTML/CSS/JS)
+│   └── application.properties  # Configurações da aplicação
 │
 └── src/test/                   # Testes
     └── java/com/bytemarket/bytemarket_api/
@@ -349,11 +359,253 @@ bytemarket-api/
 
 ---
 
+## 🛡️ Rate Limiting
+
+### Visão Geral
+
+O ByteMarket implementa rate limiting avançado usando **Bucket4j** com algoritmo **Token Bucket** para proteger a API contra:
+
+- ✅ Ataques de força bruta (brute force)
+- ✅ Sobrecarga do servidor (DDoS)
+- ✅ Abuso de endpoints sensíveis
+- ✅ Spam de requisições
+
+### Arquitetura
+
+```
+┌─────────────────┐
+│   Requisição    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Bucket4j Filter │  ← Intercepta ANTES do Spring Security
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │  Cache  │  ← JCache (Caffeine) armazena buckets
+    │ (JCache)│
+    └────┬────┘
+         │
+    ┌────┴────────────┐
+    │ Token Refill?   │
+    │ Capacity OK?    │
+    └────┬────────────┘
+         │
+    ┌────┴─────┐
+    │          │
+    ▼          ▼
+┌──────┐  ┌──────┐
+│ 200  │  │ 429  │  ← Too Many Requests
+│  OK  │  │ ERRO │
+└──────┘  └──────┘
+```
+
+### Configuração de Limites
+
+#### 1. Login (Crítico - Interval Refill)
+```properties
+Endpoint: /auth/login
+Capacidade: 10 requisições
+Janela: 1 minuto
+Estratégia: interval (não acumula tokens)
+Chave: IP do cliente
+```
+
+**Comportamento:** Bloqueia tentativas de brute force. Após 10 tentativas, usuário precisa esperar 1 minuto completo.
+
+#### 2. Registro (Crítico - Interval Refill)
+```properties
+Endpoint: /auth/register
+Capacidade: 10 requisições
+Janela: 1 minuto
+Estratégia: interval
+Chave: IP do cliente
+```
+
+**Comportamento:** Previne criação massiva de contas fake.
+
+#### 3. Webhooks (VIP - Alta Prioridade)
+```properties
+Endpoint: /webhooks/*
+Capacidade: 2000 requisições
+Janela: 1 minuto
+Estratégia: greedy (padrão)
+Chave: IP do cliente
+```
+
+**Comportamento:** Permite alto throughput para webhooks do Mercado Pago, essenciais para confirmação de pagamentos.
+
+#### 4. Admin Panel
+```properties
+Endpoint: /admin/*
+Capacidade: 500 requisições
+Janela: 1 minuto
+Chave: IP do cliente
+```
+
+**Comportamento:** Protege painel administrativo contra abuso.
+
+#### 5. API Geral da Loja
+```properties
+Endpoint: /api/*
+Capacidade: 300 requisições/minuto
+Burst: 50 requisições/10 segundos
+Chave: IP do cliente
+```
+
+**Comportamento:** Duas camadas de proteção:
+- **Limite principal:** 300 req/min para uso normal
+- **Proteção burst:** Bloqueia picos súbitos de 50+ req em 10s
+
+### Estratégias de Refill
+
+#### Greedy (Padrão)
+```java
+// Tokens são reabastecidos continuamente
+bucket4j.filters[X].rate-limits[0].bandwidths[0].refill-speed=greedy
+```
+- Reabastecimento constante e suave
+- Permite acúmulo de tokens não usados
+- Ideal para APIs gerais
+
+#### Interval
+```java
+// Tokens são reabastecidos de uma vez ao final do período
+bucket4j.filters[X].rate-limits[0].bandwidths[0].refill-speed=interval
+```
+- Reabastecimento em bloco
+- Não permite acúmulo
+- Ideal para endpoints críticos (login, registro)
+
+### Respostas HTTP
+
+#### Sucesso (200 OK)
+```json
+{
+  "data": "..."
+}
+```
+
+#### Rate Limit Excedido (429 Too Many Requests)
+```json
+{
+  "status": 429,
+  "error": "Too Many Requests",
+  "message": "Muitas tentativas de login. Aguarde 1 minuto."
+}
+```
+
+### Cabeçalhos HTTP
+
+```http
+X-RateLimit-Remaining: 8       # Requisições restantes
+X-RateLimit-Retry-After: 42    # Segundos até próxima janela
+```
+
+### Exemplo de Uso
+
+#### Request Normal
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"senha123"}'
+```
+
+**Resposta (200 OK):**
+```json
+{
+  "token": "eyJhbGc..."
+}
+```
+
+#### Request Bloqueado
+```bash
+# Após 10 tentativas em 1 minuto
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"wrong"}'
+```
+
+**Resposta (429 Too Many Requests):**
+```json
+{
+  "status": 429,
+  "error": "Too Many Attempts",
+  "message": "Muitas tentativas de login. Aguarde 1 minuto."
+}
+```
+
+### Monitoramento
+
+#### Logs do Sistema
+```log
+INFO  c.b.b.c.CacheConfig - Cache 'login-bucket' criado com sucesso
+INFO  c.b.b.c.CacheConfig - Cache 'register-bucket' criado com sucesso
+WARN  Bucket4jFilter - Rate limit exceeded for IP: 192.168.1.100
+```
+
+#### Métricas (Caffeine)
+```java
+// Estatísticas do cache
+CacheStats stats = cache.stats();
+stats.hitRate();       // Taxa de acerto
+stats.evictionCount(); // Número de evicções
+```
+
+### Configuração Personalizada
+
+#### application.properties
+```properties
+# Habilitar rate limiting
+bucket4j.enabled=true
+bucket4j.cache-to-use=jcache
+
+# Cache provider
+spring.cache.type=jcache
+spring.cache.jcache.provider=com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+
+# Configurar limites (exemplo)
+bucket4j.filters[0].cache-name=custom-bucket
+bucket4j.filters[0].url=/custom/endpoint
+bucket4j.filters[0].rate-limits[0].bandwidths[0].capacity=100
+bucket4j.filters[0].rate-limits[0].bandwidths[0].time=1
+bucket4j.filters[0].rate-limits[0].bandwidths[0].unit=minutes
+```
+
+### Ajustes para Produção
+
+#### Reverse Proxy (Render/Heroku)
+```properties
+# Obter IP real do cliente através de proxy
+server.tomcat.remoteip.internal-proxies=.*
+server.tomcat.remoteip.remote-ip-header=x-forwarded-for
+server.forward-headers-strategy=native
+```
+
+**Por quê?** Sem isso, todos os requests apareceriam com o IP do load balancer, causando bloqueios indevidos.
+
+### Boas Práticas
+
+1. **Monitoramento:** Observe logs de `429` para ajustar limites
+2. **Whitelist:** Considere exceções para IPs confiáveis
+3. **Feedback:** Retorne mensagens claras ao usuário
+4. **Escalabilidade:** Use cache distribuído (Redis) em clusters
+5. **Testes:** Simule ataques para validar proteções
+
+### Limitações Conhecidas
+
+- **Cache em memória:** Buckets não persistem após restart
+- **Distribuição:** Cada instância tem buckets separados (use Redis para sincronizar)
+- **IP dinâmico:** Usuários com IP dinâmico podem ter limitações
+
+---
+
 ## 💰 Fluxo de Pagamento PIX
 
 ### 1. Criação do Pedido
 ```java
-POST /orders
+POST /api/orders
 {
   "userId": "uuid-do-usuario",
   "deliveryEmail": "cliente@email.com",
@@ -371,7 +623,7 @@ POST /orders
 
 ### 2. Geração do PIX
 ```java
-POST /payments/pix/orders/{orderId}
+POST /api/payments/pix/orders/{orderId}
 ```
 
 **Backend:**
@@ -423,6 +675,7 @@ if (expectedHash.equals(receivedHash)) {
 | **Entrada** | Bean Validation em todos os endpoints |
 | **Concorrência** | Optimistic Locking (`@Version`) |
 | **SQL Injection** | JPA/Hibernate com queries preparadas |
+| **Rate Limiting** | Bucket4j com Token Bucket algorithm |
 | **CORS** | Configurado no SecurityConfig |
 
 ### Exemplo de Token JWT
@@ -548,7 +801,7 @@ curl -X POST http://localhost:8080/auth/login \
 
 #### Listar Produtos
 ```bash
-curl http://localhost:8080/products
+curl http://localhost:8080/api/products
 ```
 
 #### Criar Produto (Admin)
@@ -563,6 +816,17 @@ curl -X POST http://localhost:8080/admin/products \
     "imageUrl": "https://exemplo.com/imagem.jpg",
     "type": "AUTOMATIC_DELIVERY"
   }'
+```
+
+#### Testar Rate Limiting
+```bash
+# Enviar 15 requisições de login em sequência
+for i in {1..15}; do
+  curl -X POST http://localhost:8080/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@test.com","password":"wrong"}' \
+    -w "\n%{http_code}\n"
+done
 ```
 
 ---
@@ -596,11 +860,25 @@ Webhooks são:
 - ✅ Menos carga no servidor
 - ✅ Padrão recomendado pelo Mercado Pago
 
+### Por que Bucket4j com Caffeine?
+
+**Alternativas consideradas:**
+- ✅ **Spring Security:** Limitado, não oferece rate limiting flexível
+- ❌ **Redis:** Overhead desnecessário para single-instance
+- ❌ **Implementação manual:** Complexo e propenso a erros
+
+**Bucket4j + Caffeine oferece:**
+- ✅ Token Bucket algorithm (padrão da indústria)
+- ✅ Cache em memória de alta performance
+- ✅ Zero latência (não depende de rede)
+- ✅ Configuração declarativa
+- ✅ Fácil migração para Redis em clusters
+
 ---
 
 ## 📊 Status do Projeto
 
-✅ **Em Produção** - [bytemarket-15nv.onrender.com](https://bytemarket-15nv.onrender.com/)
+✅ **Em Produção** - [bytemarket-1.onrender.com](https://bytemarket-1.onrender.com/)
 
 ### Funcionalidades Implementadas
 
@@ -611,18 +889,21 @@ Webhooks são:
 - [x] Webhooks com validação HMAC
 - [x] Envio de emails transacionais
 - [x] Gestão de estoque com Optimistic Locking
+- [x] Rate limiting com Bucket4j e Caffeine
 - [x] Documentação Swagger
 - [x] Deploy em produção
 - [x] Interface web funcional
 
 ### Roadmap Futuro
 
-- [ ] Implementar Redis para cache
+- [ ] Migrar cache para Redis (cluster)
 - [ ] Sistema de cupons de desconto
 - [ ] Painel de analytics para admin
 - [ ] Testes de integração completos
 - [ ] CI/CD com GitHub Actions
 - [ ] Suporte a múltiplos métodos de pagamento
+- [ ] Rate limiting por usuário autenticado
+- [ ] Dashboard de métricas do Bucket4j
 
 ---
 
@@ -642,6 +923,7 @@ Contribuições são bem-vindas! Para contribuir:
 - Documentar métodos públicos com Javadoc
 - Escrever testes para novos endpoints
 - Validar entrada com Bean Validation
+- Considerar impacto no rate limiting
 
 ---
 
@@ -664,6 +946,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 - [Spring Boot](https://spring.io/projects/spring-boot) - Framework utilizado
 - [Mercado Pago Developers](https://www.mercadopago.com.br/developers) - Gateway de pagamento
+- [Bucket4j](https://bucket4j.com/) - Rate limiting library
+- [Caffeine](https://github.com/ben-manes/caffeine) - High performance cache
 - [Swagger](https://swagger.io/) - Documentação da API
 - Comunidade open-source
 
